@@ -1,18 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
-public class Rabbit : MonoBehaviour
+namespace Entities.Animals
 {
-    // Start is called before the first frame update
-    void Start()
+    public class Rabbit : Animal
     {
-        
-    }
+        // traits
+        private readonly float _moveSpeed = 2.5f;
+        private readonly float _senseRadius = 4f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        // diet
+        private readonly Type _diet = typeof(Plant);
+
+        // constructor
+        public Rabbit()
+        {
+            moveSpeed = _moveSpeed;
+            senseRadius = _senseRadius;
+            diet = _diet;
+        }
     }
 }
+
