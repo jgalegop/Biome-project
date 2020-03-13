@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Entities
 {
@@ -18,7 +16,7 @@ namespace Entities
             transform.rotation = Quaternion.Euler(0, startingAngle, 0);
 
             Vector3 pos = transform.position;
-            transform.position = new Vector3(pos.x, 0, pos.z);
+            transform.position = new Vector3(pos.x, 1, pos.z);
         }
 
         public virtual void Die()

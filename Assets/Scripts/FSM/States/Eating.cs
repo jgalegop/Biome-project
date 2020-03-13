@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using Entities;
 
 public class Eating : State
 {
+    private float _energyGained = 50f;
+
     private Animal _animal;
     public Eating(Animal animal) : base(animal.gameObject)
     {
@@ -14,7 +13,8 @@ public class Eating : State
 
     public override Type Tick()
     {
-        Debug.Log("eating");
+        _animal.GainEnergy(_energyGained);
+
         if (_animal.TargetFood == null)
         {
             return typeof(Exploring);

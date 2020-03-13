@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Entities;
 
@@ -11,6 +9,8 @@ public class ChasingFood : State
 
     private readonly float interactionDistance = 1f;
 
+    private float _energyLost = 5f;
+
     public ChasingFood(Animal animal) : base(animal.gameObject)
     {
         _animal = animal;
@@ -19,8 +19,10 @@ public class ChasingFood : State
 
     public override Type Tick()
     {
+        _animal.LoseEnergy(_energyLost);
+
         // TODO: take obstacles into account (some pathfinding)
-        Debug.Log("chasing");
+
         if (_animal.TargetFood == null)
         {
             return typeof(Exploring);

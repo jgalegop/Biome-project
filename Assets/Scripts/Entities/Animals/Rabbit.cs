@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 
 namespace Entities.Animals
@@ -14,12 +12,19 @@ namespace Entities.Animals
         // diet
         private readonly Type _diet = typeof(Plant);
 
+        // energy
+        private float _maxEnergy = 100;
+
         // constructor
         public Rabbit()
         {
+            // constants
             moveSpeed = _moveSpeed;
             senseRadius = _senseRadius;
             diet = _diet;
+
+            // variable
+            maxEnergy = _maxEnergy;
         }
 
         private void OnDrawGizmos()

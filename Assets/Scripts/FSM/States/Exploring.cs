@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Entities;
-using System.Linq;
 
 public class Exploring : State
 {
@@ -24,6 +21,9 @@ public class Exploring : State
 
     private Type _diet;
 
+    private float _energyLost = 5f;
+    private float _hungerThreshold = 50f;
+
     public Exploring(Animal animal) : base(animal.gameObject)
     {
         _animal = animal;
@@ -38,7 +38,8 @@ public class Exploring : State
 
     public override Type Tick()
     {
-        // Debug.Log("exploring");
+        _animal.LoseEnergy(_energyLost);
+
         if (IsHungry())
         {
             var foodTarget = NearbyFood();
@@ -93,7 +94,7 @@ public class Exploring : State
 
     private bool IsHungry()
     {
-        return Input.GetKeyDown(KeyCode.H);
+        return _animal.GetEnergy() < _hungerThreshold;
     }
 
     private LivingBeing NearbyFood()
@@ -125,12 +126,11 @@ public class Exploring : State
 
     private void FindRandomDestination()
     {
-
         // Some hard-coded distances 
         float dist1 = 2f * transform.localScale.z; // based on the forward scale
         float dist2 = dist1 * 3f;
         Vector3 testPosition = (transform.position + (transform.forward * dist1)
-            + new Vector3(UnityEngine.Random.Range(-dist2, dist2), 0, UnityEngine.Random.Range(-dist2, dist2)));
+            + new Vector3(UnityEngine.Random.Range(-dist2, dist2), 1, UnityEngine.Random.Range(-dist2, dist2)));
 
         _destination = new Vector3(testPosition.x, 1f, testPosition.z);
 

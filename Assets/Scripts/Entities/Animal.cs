@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -17,6 +16,11 @@ namespace Entities
         protected float senseRadius;
         protected Type diet;
 
+        [SerializeField] // for debugging
+        private float energy;
+
+        public float maxEnergy { get; protected set; }
+
         public LivingBeing TargetFood { get; private set; } 
 
         // IMPROVABLE
@@ -26,6 +30,8 @@ namespace Entities
         {
             base.Awake();
             InitializeFSM();
+
+            energy = maxEnergy;
         }
 
         private void InitializeFSM()
@@ -46,8 +52,28 @@ namespace Entities
             TargetFood = target;
         }
 
-        // get animal traits
+        public void LoseEnergy(float energyLost)
+        {
+            energy -= energyLost * Time.deltaTime;
+            if (energy <= 0)
+            {
+                Die();
+            }
+        }
 
+        public void GainEnergy(float energyGained)
+        {
+            energy += energyGained * Time.deltaTime;
+        }
+
+        public float GetEnergy()
+        {
+            return energy;
+        }
+
+
+
+        // get animal traits
         public float GetMoveSpeed()
         {
             return moveSpeed;
