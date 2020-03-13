@@ -7,26 +7,33 @@ using Entities;
 public class ChasingFood : State
 {
     private Animal _animal;
+    private float _moveSpeed;
+
+    private readonly float interactionDistance = 1f;
 
     public ChasingFood(Animal animal) : base(animal.gameObject)
     {
         _animal = animal;
+        _moveSpeed = _animal.GetMoveSpeed();
     }
 
     public override Type Tick()
     {
-        Debug.Log("chasing food");
-        if (Input.GetKey(KeyCode.X))
+        // TODO: take obstacles into account (some pathfinding)
+        Debug.Log("chasing");
+        if (_animal.TargetFood == null)
         {
             return typeof(Exploring);
         }
-        else if (Input.GetKey(KeyCode.E))
+        transform.LookAt(_animal.TargetFood.transform.position);
+        transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
+
+        float dist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);
+        if (dist < interactionDistance)
         {
             return typeof(Eating);
         }
-        else
-        {
-            return typeof(ChasingFood);
-        }
+
+        return null;
     }
 }

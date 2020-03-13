@@ -17,6 +17,8 @@ namespace Entities
         protected float senseRadius;
         protected Type diet;
 
+        public LivingBeing TargetFood { get; private set; } 
+
         // IMPROVABLE
         public FiniteStateMachine fsm => GetComponent<FiniteStateMachine>();
 
@@ -38,6 +40,13 @@ namespace Entities
             GetComponent<FiniteStateMachine>().SetStates(states);
 
         }
+
+        public void SetTargetFood(LivingBeing target)
+        {
+            TargetFood = target;
+        }
+
+        // get animal traits
 
         public float GetMoveSpeed()
         {

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Entities;
+using System.Linq;
 
 public class Exploring : State
 {
@@ -37,53 +38,89 @@ public class Exploring : State
 
     public override Type Tick()
     {
-        // sensed food
-        if (IsFoodNearby())
+        // Debug.Log("exploring");
+        if (IsHungry())
         {
-            return typeof(ChasingFood);
-        }
-        // eating food
-        else if (Input.GetKey(KeyCode.E))
-        {
-            return typeof(Eating);
-        }
-        else
-        {
-            if (_destination.HasValue == false ||
-                Vector3.Distance(transform.position, _destination.Value) <= _stopDistance)
+            var foodTarget = NearbyFood();
+            if (foodTarget != null)
             {
-                FindRandomDestination();
-            }
-
-            // turn towards target destination
-            transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, _turnSpeed * Time.deltaTime);
-
-            if (IsForwardBlocked())
-            {
-                transform.rotation = Quaternion.Lerp(transform.rotation, _desiredRotation, 0.2f);
+                _animal.SetTargetFood(foodTarget);
+                _destination = null;
+                return typeof(ChasingFood);
             }
             else
             {
-                // moves facing forward
-                transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
+                return KeepExploring();
             }
-
-            Debug.DrawRay(transform.position, _direction * _rayDistance, Color.red);
-            
-            while (IsPathBlocked())
-            {
-                FindRandomDestination();
-            }
-
-            return null;
         }
+
+        return KeepExploring();
     }
 
-    private bool IsFoodNearby()
+    private Type KeepExploring()
+    {
+        if (_destination.HasValue == false ||
+                            Vector3.Distance(transform.position, _destination.Value) <= _stopDistance)
+        {
+            FindRandomDestination();
+        }
+
+        // turn towards target destination
+        transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, _turnSpeed * Time.deltaTime);
+
+        if (IsForwardBlocked())
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, _desiredRotation, 0.2f);
+        }
+        else
+        {
+            // moves facing forward
+            transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
+        }
+
+        Debug.DrawRay(transform.position, _direction * _rayDistance, Color.red);
+        
+
+        while (IsPathBlocked())
+        {
+            FindRandomDestination();
+        }
+
+        Debug.DrawRay(transform.position, _destination.Value - transform.position, Color.magenta);
+
+        return null;
+    }
+
+    private bool IsHungry()
+    {
+        return Input.GetKeyDown(KeyCode.H);
+    }
+
+    private LivingBeing NearbyFood()
     {
         Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _senseRadius);
 
-        return false;
+        // filter all with type _diet
+        Collider[] nearbyFoodColliders = 
+            Array.FindAll(nearbyColliders, c => c.gameObject.GetComponent<LivingBeing>()?.GetType() == _diet);
+        LivingBeing[] nearbyFood = 
+            Array.ConvertAll(nearbyFoodColliders, c => c.gameObject.GetComponent<LivingBeing>());
+
+        // check which one's closer and target it
+        LivingBeing closestFood = null;
+        float smallestDist = _senseRadius + 1;
+        foreach (LivingBeing lb in nearbyFood)
+        {
+            float dist = Vector3.Distance(transform.position, lb.transform.position);
+            if (dist < smallestDist &&
+                dist > Mathf.Epsilon)
+            {
+                closestFood = lb;
+                smallestDist = dist;
+            }
+        }
+
+        return closestFood;
     }
 
     private void FindRandomDestination()

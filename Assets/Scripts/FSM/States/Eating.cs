@@ -15,17 +15,12 @@ public class Eating : State
     public override Type Tick()
     {
         Debug.Log("eating");
-        if (Input.GetKey(KeyCode.C))
-        {
-            return typeof(ChasingFood);
-        }
-        else if (Input.GetKey(KeyCode.X))
+        if (_animal.TargetFood == null)
         {
             return typeof(Exploring);
         }
-        else
-        {
-            return typeof(Eating);
-        }
+
+        _animal.TargetFood.BeingEaten();
+        return null;
     }
 }

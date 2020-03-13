@@ -9,7 +9,7 @@ namespace Entities.Animals
     {
         // traits
         private readonly float _moveSpeed = 2.5f;
-        private readonly float _senseRadius = 4f;
+        private readonly float _senseRadius = 8f;
 
         // diet
         private readonly Type _diet = typeof(Plant);
@@ -20,6 +20,11 @@ namespace Entities.Animals
             moveSpeed = _moveSpeed;
             senseRadius = _senseRadius;
             diet = _diet;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(transform.position, _senseRadius);
         }
     }
 }
