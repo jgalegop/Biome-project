@@ -8,6 +8,7 @@ namespace Entities
     /// <summary>
     /// Abstract class with the AI that dominates all animals. 
     /// Inherits from livingbeing in order to spawn and kill an animal entity.
+    /// Controls energy and defines different animal traits (move speed, sense radius, diet...)
     /// </summary>
     [RequireComponent(typeof(FiniteStateMachine))]
     public abstract class Animal : LivingBeing
@@ -44,7 +45,6 @@ namespace Entities
             };
 
             GetComponent<FiniteStateMachine>().SetStates(states);
-
         }
 
         public void SetTargetFood(LivingBeing target)
@@ -52,18 +52,11 @@ namespace Entities
             TargetFood = target;
         }
 
-        public void LoseEnergy(float energyLost)
+        public void ModifyEnergy(float energyLost)
         {
-            energy -= energyLost * Time.deltaTime;
+            energy += energyLost * Time.deltaTime;
             if (energy <= 0)
-            {
                 Die();
-            }
-        }
-
-        public void GainEnergy(float energyGained)
-        {
-            energy += energyGained * Time.deltaTime;
         }
 
         public float GetEnergy()

@@ -13,7 +13,7 @@ public class Eating : State
 
     public override Type Tick()
     {
-        _animal.GainEnergy(_energyGained);
+        _animal.ModifyEnergy(+_energyGained);
 
         if (_animal.TargetFood == null)
         {

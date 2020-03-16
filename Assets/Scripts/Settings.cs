@@ -7,6 +7,8 @@ public class Settings : MonoBehaviour
     [SerializeField]
     private float timeScale = 1f;
 
+    public enum EnergyDisplayMode {All, OnSelected};
+
     private void Update()
     {
         Time.timeScale = timeScale;

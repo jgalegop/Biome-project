@@ -7,6 +7,10 @@ public class ChasingFood : State
     private Animal _animal;
     private float _moveSpeed;
 
+    private Quaternion _targetFoodRotation;
+    private Vector3 _targetFoodDirection;
+    private float _turnSpeed = 3f;
+
     private readonly float interactionDistance = 1f;
 
     private float _energyLost = 5f;
@@ -19,7 +23,7 @@ public class ChasingFood : State
 
     public override Type Tick()
     {
-        _animal.LoseEnergy(_energyLost);
+        _animal.ModifyEnergy(-_energyLost);
 
         // TODO: take obstacles into account (some pathfinding)
 
@@ -27,7 +31,11 @@ public class ChasingFood : State
         {
             return typeof(Exploring);
         }
-        transform.LookAt(_animal.TargetFood.transform.position);
+
+        _targetFoodDirection = Vector3.Normalize(_animal.TargetFood.transform.position - transform.position);
+        _targetFoodRotation = Quaternion.LookRotation(_targetFoodDirection);
+
+        transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, _turnSpeed * Time.deltaTime);
         transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
 
         float dist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);

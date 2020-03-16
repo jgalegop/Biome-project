@@ -38,7 +38,7 @@ public class Exploring : State
 
     public override Type Tick()
     {
-        _animal.LoseEnergy(_energyLost);
+        _animal.ModifyEnergy(-_energyLost);
 
         if (IsHungry())
         {
