@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System;
+using Random = UnityEngine.Random;
 
 namespace Entities.Animals
 {
@@ -15,16 +16,24 @@ namespace Entities.Animals
         // energy
         private float _maxEnergy = 100;
 
-        // constructor
+
+        // class constructor
         public Rabbit()
         {
-            // constants
-            moveSpeed = _moveSpeed;
-            senseRadius = _senseRadius;
+            // constants since construction
             diet = _diet;
 
             // variable
             maxEnergy = _maxEnergy;
+        }
+
+
+        // called in Awake so each object with this class has different initial values
+        public override void Awake()
+        {
+            moveSpeed = _moveSpeed + Random.Range(-1f, 1f);
+            senseRadius = _senseRadius + Random.Range(-3f, 3f);
+            base.Awake();
         }
 
         private void OnDrawGizmos()

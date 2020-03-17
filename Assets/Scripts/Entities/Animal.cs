@@ -22,10 +22,12 @@ namespace Entities
 
         public float maxEnergy { get; protected set; }
 
-        public LivingBeing TargetFood { get; private set; } 
+        public LivingBeing TargetFood { get; private set; }
+
+        public event Action OnAnimalDeath = delegate { };
 
         // IMPROVABLE
-        public FiniteStateMachine fsm => GetComponent<FiniteStateMachine>();
+        public FiniteStateMachine FSM => GetComponent<FiniteStateMachine>();
 
         public override void Awake()
         {
@@ -44,8 +46,16 @@ namespace Entities
                 {typeof(Eating), new Eating(this) }
             };
 
-            GetComponent<FiniteStateMachine>().SetStates(states);
+            FSM.SetStates(states);
         }
+
+
+        public override void Die()
+        {
+            OnAnimalDeath?.Invoke();
+            base.Die();
+        }
+
 
         public void SetTargetFood(LivingBeing target)
         {
@@ -81,7 +91,13 @@ namespace Entities
         {
             return diet;
         }
-    }
 
+        
+        public string GetDietText()
+        {
+            String[] subTypes = GetDiet().ToString().Split('.');
+            return subTypes[subTypes.Length - 1];
+        }
+    }
 }
 

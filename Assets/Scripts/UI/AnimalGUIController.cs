@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using Entities;
+﻿using Entities;
 using UnityEngine;
 
 public class AnimalGUIController : MonoBehaviour
@@ -11,8 +8,6 @@ public class AnimalGUIController : MonoBehaviour
 
     [SerializeField]
     private EnergyBarUI _energyBarUI = null;
-
-    //private EnergyBarUI _energyBarUI;
 
     private void Awake()
     {
