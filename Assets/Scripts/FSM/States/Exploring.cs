@@ -61,7 +61,7 @@ public class Exploring : State
     private Type KeepExploring()
     {
         if (_destination.HasValue == false ||
-                            Vector3.Distance(transform.position, _destination.Value) <= _stopDistance)
+            Vector3.Distance(transform.position, _destination.Value) <= _stopDistance)
         {
             FindRandomDestination();
         }
@@ -80,14 +80,11 @@ public class Exploring : State
         }
 
         Debug.DrawRay(transform.position, _direction * _rayDistance, Color.red);
-        
 
         while (IsPathBlocked())
         {
             FindRandomDestination();
         }
-
-        Debug.DrawRay(transform.position, _destination.Value - transform.position, Color.magenta);
 
         return null;
     }
