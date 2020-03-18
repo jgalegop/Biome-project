@@ -17,10 +17,9 @@ namespace Entities
         protected float senseRadius;
         protected Type diet;
 
-        [SerializeField] // for debugging
-        private float energy;
+        private float _energy;
 
-        public float maxEnergy { get; protected set; }
+        public float MaxEnergy { get; protected set; }
 
         public LivingBeing TargetFood { get; private set; }
 
@@ -34,7 +33,7 @@ namespace Entities
             base.Awake();
             InitializeFSM();
 
-            energy = maxEnergy;
+            _energy = MaxEnergy;
         }
 
         private void InitializeFSM()
@@ -49,48 +48,45 @@ namespace Entities
             FSM.SetStates(states);
         }
 
-
         public override void Die()
         {
             OnAnimalDeath?.Invoke();
             base.Die();
         }
 
-
         public void SetTargetFood(LivingBeing target)
         {
             TargetFood = target;
         }
 
+
+        public virtual void MoveTick(Vector3 destination)
+        {
+            transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+        }
+
+
+        //  -----  ENERGY  -----  
         public void ModifyEnergy(float energyLost)
         {
-            energy += energyLost * Time.deltaTime;
-            if (energy <= 0)
+            _energy += energyLost * Time.deltaTime;
+            if (_energy <= 0)
                 Die();
         }
 
         public float GetEnergy()
         {
-            return energy;
+            return _energy;
         }
 
 
 
-        // get animal traits
-        public float GetMoveSpeed()
-        {
-            return moveSpeed;
-        }
+        //  -----  GET TRAITS  -----  
+        public float GetMoveSpeed() { return moveSpeed; }
 
-        public float GetSenseRadius()
-        {
-            return senseRadius;
-        }
+        public float GetSenseRadius() { return senseRadius; }
 
-        public Type GetDiet()
-        {
-            return diet;
-        }
+        public Type GetDiet() { return diet; }
 
         
         public string GetDietText()

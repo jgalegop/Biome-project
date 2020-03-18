@@ -4,6 +4,7 @@ using Random = UnityEngine.Random;
 
 namespace Entities.Animals
 {
+    [RequireComponent(typeof(RabbitMovement))]
     public class Rabbit : Animal
     {
         // traits
@@ -16,6 +17,9 @@ namespace Entities.Animals
         // energy
         private float _maxEnergy = 100;
 
+        // movement
+        private RabbitMovement _rabbitMovement => GetComponent<RabbitMovement>();
+
 
         // class constructor
         public Rabbit()
@@ -24,7 +28,7 @@ namespace Entities.Animals
             diet = _diet;
 
             // variable
-            maxEnergy = _maxEnergy;
+            MaxEnergy = _maxEnergy;
         }
 
 
@@ -36,6 +40,13 @@ namespace Entities.Animals
             base.Awake();
         }
 
+        public override void MoveTick(Vector3 destination)
+        {
+            _rabbitMovement.Tick(destination);
+        }
+
+
+        // debug
         private void OnDrawGizmos()
         {
             Gizmos.DrawWireSphere(transform.position, _senseRadius);

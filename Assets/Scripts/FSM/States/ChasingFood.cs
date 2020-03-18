@@ -36,7 +36,9 @@ public class ChasingFood : State
         _targetFoodRotation = Quaternion.LookRotation(_targetFoodDirection);
 
         transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, _turnSpeed * Time.deltaTime);
-        transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
+
+        _animal.MoveTick(_animal.TargetFood.transform.position);
+        //transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
 
         float dist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);
         if (dist < interactionDistance)

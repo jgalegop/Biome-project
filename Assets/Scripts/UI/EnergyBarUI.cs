@@ -50,7 +50,7 @@ public class EnergyBarUI : MonoBehaviour
     {
         if (energyBar.activeSelf)
         {
-            foregroundImage.fillAmount = _boundAnimal.GetEnergy() / _boundAnimal.maxEnergy;
+            foregroundImage.fillAmount = _boundAnimal.GetEnergy() / _boundAnimal.MaxEnergy;
 
             _energyBarRect.anchoredPosition = WorldToCameraSpace(_boundAnimal.transform.position + Vector3.up * energyBarOffset);
         }

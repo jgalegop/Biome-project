@@ -27,6 +27,12 @@ public class AnimalPanel : MonoBehaviour
     private GameObject _animalPanel = null;
 
     private Animal _boundAnimal;
+    private Vector3 _animalGraphicScale;
+
+    private void Awake()
+    {
+        _animalGraphicScale = _animalGraphic.localScale;
+    }
 
     public void Bind(Animal animal)
     {
@@ -59,16 +65,18 @@ public class AnimalPanel : MonoBehaviour
 
     private void DisplayStats(Animal animal)
     {
-        _moveSpeedNumber.SetText(animal.GetMoveSpeed().ToString("F1"));
-        _senseRadiusNumber.SetText(animal.GetSenseRadius().ToString("F1"));
+        _moveSpeedNumber.SetText(animal.GetMoveSpeed().ToString("F1") + " m/s");
+        _senseRadiusNumber.SetText(animal.GetSenseRadius().ToString("F1") + " m");
         _dietText.SetText(animal.GetDietText());
     }
 
     private void UpdateHealth()
     {
-        _energyBar.fillAmount = _boundAnimal.GetEnergy() / _boundAnimal.maxEnergy;
+        _energyBar.fillAmount = _boundAnimal.GetEnergy() / _boundAnimal.MaxEnergy;
         _energyText.SetText(((int)_boundAnimal.GetEnergy()).ToString());
         _animalGraphic.rotation = _boundAnimal.transform.rotation;
+        Vector3 scaledLocalScale = Vector3.Scale(_boundAnimal.transform.localScale, _animalGraphicScale);
+        _animalGraphic.localScale = scaledLocalScale;
     }
 
     private void HandleAnimalDeath()

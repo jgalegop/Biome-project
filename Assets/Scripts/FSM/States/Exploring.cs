@@ -75,11 +75,10 @@ public class Exploring : State
         }
         else
         {
-            // moves facing forward
-            transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
+            _animal.MoveTick(_destination.Value); // calls move method in animal
         }
 
-        Debug.DrawRay(transform.position, _direction * _rayDistance, Color.red);
+        Debug.DrawRay(transform.position, _destination.Value - transform.position, Color.red);
 
         while (IsPathBlocked())
         {
