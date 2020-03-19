@@ -22,12 +22,16 @@ public class Pathfinding : MonoBehaviour
         Node startNode = _grid.NodeFromWorldInput(startPos);
         Node targetNode = _grid.NodeFromWorldInput(targetPos);
 
-        List<Node> openSet = new List<Node>();
+        Heap<Node> openSet = new Heap<Node>(_grid.MaxSize);
         HashSet<Node> closedSet = new HashSet<Node>();
         openSet.Add(startNode);
 
         while (openSet.Count > 0)
         {
+            Node currentNode = openSet.RemoveFirst();
+
+            // without heap
+            /*
             Node currentNode = openSet[0];
             for (int i = 1; i < openSet.Count; i++)
             {
@@ -38,6 +42,8 @@ public class Pathfinding : MonoBehaviour
                 }
             }
             openSet.Remove(currentNode);
+            */
+
             closedSet.Add(currentNode);
 
             if (currentNode == targetNode)

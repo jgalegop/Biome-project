@@ -45,6 +45,14 @@ public class PathfindGrid : MonoBehaviour
         }
     }
 
+    public int MaxSize
+    {
+        get
+        {
+            return _gridSizeX * _gridSizeY;
+        }
+    }
+
     public List<Node> GetNeighbours(Node node)
     {
         List<Node> neighbours = new List<Node>();
