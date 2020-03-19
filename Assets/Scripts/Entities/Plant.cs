@@ -11,7 +11,9 @@ namespace Entities
         {
             Vector3 currentScale = transform.localScale;
             transform.localScale = currentScale - Vector3.one * decaySpeed * Time.deltaTime;
-            if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0)
+            if (transform.localScale.x < 0 ||
+                transform.localScale.y < 0 ||
+                transform.localScale.z < 0)
             {
                 Die();
             }

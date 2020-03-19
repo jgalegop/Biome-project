@@ -117,4 +117,10 @@ public class RabbitMovement : MonoBehaviour
     {
         return isJumping;
     }
+
+    private void OnDestroy()
+    {
+        if (DOTween.IsTweening(transform))
+            DOTween.Kill(transform);
+    }
 }

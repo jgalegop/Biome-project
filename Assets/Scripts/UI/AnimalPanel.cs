@@ -2,6 +2,7 @@
 using UnityEngine.UI;
 using TMPro;
 using Entities;
+using DG.Tweening;
 
 public class AnimalPanel : MonoBehaviour
 {
@@ -26,12 +27,18 @@ public class AnimalPanel : MonoBehaviour
     [SerializeField]
     private GameObject _animalPanel = null;
 
+    [SerializeField]
+    private GameObject _panelImage = null;
+
     private Animal _boundAnimal;
     private Vector3 _animalGraphicScale;
 
     private void Awake()
     {
         _animalGraphicScale = _animalGraphic.localScale;
+        _panelImage.transform.localScale = Vector3.zero;
+
+        _animalPanel.SetActive(false);
     }
 
     public void Bind(Animal animal)
@@ -48,19 +55,25 @@ public class AnimalPanel : MonoBehaviour
             _boundAnimal.OnAnimalDeath += HandleAnimalDeath;
             DisplayStats(_boundAnimal);
             _animalPanel.SetActive(true);
+
+            if (DOTween.IsTweening(_panelImage.transform))
+                DOTween.Kill(_panelImage.transform);
+
+            _panelImage.transform.DOScale(Vector3.one, 0.4f)
+                                 .SetEase(Ease.OutBack);
         }
         else
         {
-            _animalPanel.SetActive(false);
+            _panelImage.transform.DOScale(Vector3.zero, 0.4f)
+                                 .SetEase(Ease.InBack)
+                                 .OnComplete(DisableAfterTween);
         }
     }
 
     private void Update()
     {
         if (_animalPanel.activeSelf)
-        {
-            UpdateHealth();
-        }
+            UpdatePanel();
     }
 
     private void DisplayStats(Animal animal)
@@ -70,8 +83,10 @@ public class AnimalPanel : MonoBehaviour
         _dietText.SetText(animal.GetDietText());
     }
 
-    private void UpdateHealth()
+    private void UpdatePanel()
     {
+        if (_boundAnimal == null)
+            return;
         _energyBar.fillAmount = _boundAnimal.GetEnergy() / _boundAnimal.MaxEnergy;
         _energyText.SetText(((int)_boundAnimal.GetEnergy()).ToString());
         _animalGraphic.rotation = _boundAnimal.transform.rotation;
@@ -82,5 +97,10 @@ public class AnimalPanel : MonoBehaviour
     private void HandleAnimalDeath()
     {
         Bind(null);
+    }
+
+    private void DisableAfterTween()
+    {
+        _animalPanel.SetActive(false);
     }
 }

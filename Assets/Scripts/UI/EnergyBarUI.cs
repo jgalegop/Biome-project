@@ -46,7 +46,7 @@ public class EnergyBarUI : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void LateUpdate()
     {
         if (energyBar.activeSelf)
         {
