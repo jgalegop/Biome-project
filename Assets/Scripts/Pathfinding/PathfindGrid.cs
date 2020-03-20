@@ -11,13 +11,14 @@ public class PathfindGrid : MonoBehaviour
     [SerializeField]
     private float _nodeRadius = 1f;
 
-    public List<Node> Path;
+    [SerializeField]
+    private bool _displayGridGizmos = true;
 
     private Node[,] grid;
     private float _nodeDiameter;
     private int _gridSizeX, _gridSizeY;
 
-    private void Start()
+    private void Awake()
     {
         transform.position = Vector3.zero;
 
@@ -91,20 +92,19 @@ public class PathfindGrid : MonoBehaviour
     }
 
 
+
+
+
     private void OnDrawGizmos()
     {
         Gizmos.DrawWireCube(transform.position, new Vector3(_gridWorldSize.x, 5, _gridWorldSize.y));
 
-        if (grid != null)
+        if (grid != null && _displayGridGizmos)
         {
             foreach (Node node in grid)
             {
                 Gizmos.color = node.Walkable ? Color.white : Color.red;
-                if (Path != null)
-                {
-                    if (Path.Contains(node))
-                        Gizmos.color = Color.black;
-                }
+                Debug.Log(Gizmos.color);
                 Gizmos.DrawCube(node.WorldPos + Vector3.down * 0f, 
                     _nodeDiameter * 0.9f * Vector3.one - _nodeDiameter * 0.95f * Vector3.up);
             }
