@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Eating : State
 {
-    private float _energyGained = 5f;
+    private float _energyGained = 25f;
 
     private Animal _animal;
     public Eating(Animal animal) : base(animal.gameObject)

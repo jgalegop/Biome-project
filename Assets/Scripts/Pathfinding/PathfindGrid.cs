@@ -5,8 +5,7 @@ public class PathfindGrid : MonoBehaviour
 {
     public LayerMask _unwalkableMask;
 
-    [SerializeField]
-    private Vector2 _gridWorldSize = new Vector3(10, 1, 10);
+    public Vector2 GridWorldSize = new Vector2(10, 10);
 
     [SerializeField]
     private float _nodeRadius = 1f;
@@ -23,16 +22,16 @@ public class PathfindGrid : MonoBehaviour
         transform.position = Vector3.zero;
 
         _nodeDiameter = 2 * _nodeRadius;
-        _gridSizeX = Mathf.RoundToInt(_gridWorldSize.x / _nodeDiameter);
-        _gridSizeY = Mathf.RoundToInt(_gridWorldSize.y / _nodeDiameter);
+        _gridSizeX = Mathf.RoundToInt(GridWorldSize.x / _nodeDiameter);
+        _gridSizeY = Mathf.RoundToInt(GridWorldSize.y / _nodeDiameter);
         CreateGrid();
     }
 
     private void CreateGrid()
     {
         grid = new Node[_gridSizeX, _gridSizeY];
-        Vector3 worldBottomLeft = transform.position + 0.5f * _gridWorldSize.x * Vector3.left
-                                                     + 0.5f * _gridWorldSize.y * Vector3.back;
+        Vector3 worldBottomLeft = transform.position + 0.5f * GridWorldSize.x * Vector3.left
+                                                     + 0.5f * GridWorldSize.y * Vector3.back;
 
         for (int x = 0; x < _gridSizeX; x++)
         {
@@ -81,8 +80,8 @@ public class PathfindGrid : MonoBehaviour
 
     public Node NodeFromWorldInput(Vector3 worldPos)
     {
-        float percentX = (worldPos.x + 0.5f * _gridWorldSize.x) / _gridWorldSize.x;
-        float percentY = (worldPos.z + 0.5f * _gridWorldSize.y) / _gridWorldSize.y;
+        float percentX = (worldPos.x + 0.5f * GridWorldSize.x) / GridWorldSize.x;
+        float percentY = (worldPos.z + 0.5f * GridWorldSize.y) / GridWorldSize.y;
         percentX = Mathf.Clamp01(percentX);
         percentY = Mathf.Clamp01(percentY);
 
@@ -90,10 +89,6 @@ public class PathfindGrid : MonoBehaviour
         int y = Mathf.RoundToInt(percentY * (_gridSizeY - 1));
         return grid[x, y];
     }
-
-
-
-
 
     private void OnDrawGizmos()
     {

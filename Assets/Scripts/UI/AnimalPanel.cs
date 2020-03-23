@@ -95,7 +95,7 @@ public class AnimalPanel : MonoBehaviour
         _animalGraphic.rotation = _boundAnimal.transform.rotation;
         Vector3 scaledLocalScale = Vector3.Scale(_boundAnimal.transform.localScale, _animalGraphicScale);
         _animalGraphic.localScale = scaledLocalScale;
-        _stateText.SetText("(" + _boundAnimal.GetState().ToString() + ")");
+        _stateText.SetText("(" + _boundAnimal.GetStateName() + ")");
     }
 
     private void HandleAnimalDeath()

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 
 
 namespace Entities
@@ -6,6 +7,7 @@ namespace Entities
     public class Plant : LivingBeing
     {
         private readonly float decaySpeed = 1f;
+
         // energy that provides? 
         public override void BeingEaten()
         {

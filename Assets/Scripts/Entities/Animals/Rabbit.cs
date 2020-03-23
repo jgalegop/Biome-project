@@ -40,22 +40,12 @@ namespace Entities.Animals
         {
             moveSpeed = _moveSpeed + Random.Range(-_moveSpeedVar, _moveSpeedVar);
             senseRadius = _senseRadius + Random.Range(-_senseRadiusVar, _senseRadiusVar);
-
-            // TO DO: redo the energy loss by move speed
-            float clamp = Clamp(_moveSpeed - 0.5f * _moveSpeedVar, _moveSpeed + 0.5f * _moveSpeedVar, moveSpeed);
-            energyLost = _moveSpeed + 0.5f * _moveSpeedVar * (2f * clamp - 1f);
             base.Awake();
         }
 
         public override void MoveTick(Vector3 destination)
         {
             _rabbitMovement.Tick(destination);
-        }
-
-        // utility
-        private float Clamp(float a, float b, float x)
-        {
-            return Mathf.Clamp01((x - a) / (b - a));
         }
 
 

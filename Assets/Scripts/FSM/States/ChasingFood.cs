@@ -29,6 +29,8 @@ public class ChasingFood : State
         _moveSpeed = _animal.GetMoveSpeed();
         _energyLost = _animal.GetEnergyLostPerTick();
         _debug = GameObject.FindObjectOfType<PathfindingDebug>();
+
+        StateName = "Chasing food";
     }
 
     public override Type Tick()
