@@ -18,6 +18,7 @@ namespace Entities
         protected Type diet;
 
         private float _energy;
+        protected float energyLost;
 
         public float MaxEnergy { get; protected set; }
 
@@ -88,6 +89,9 @@ namespace Entities
 
         public Type GetDiet() { return diet; }
 
+        public float GetEnergyLostPerTick() { return energyLost; }
+
+        public State GetState() { return FSM.CurrentState; }
         
         public string GetDietText()
         {

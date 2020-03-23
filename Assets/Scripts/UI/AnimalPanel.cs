@@ -30,6 +30,9 @@ public class AnimalPanel : MonoBehaviour
     [SerializeField]
     private GameObject _panelImage = null;
 
+    [SerializeField]
+    private TMP_Text _stateText = null;
+
     private Animal _boundAnimal;
     private Vector3 _animalGraphicScale;
 
@@ -92,6 +95,7 @@ public class AnimalPanel : MonoBehaviour
         _animalGraphic.rotation = _boundAnimal.transform.rotation;
         Vector3 scaledLocalScale = Vector3.Scale(_boundAnimal.transform.localScale, _animalGraphicScale);
         _animalGraphic.localScale = scaledLocalScale;
+        _stateText.SetText("(" + _boundAnimal.GetState().ToString() + ")");
     }
 
     private void HandleAnimalDeath()

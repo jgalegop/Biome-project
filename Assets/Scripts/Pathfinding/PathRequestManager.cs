@@ -43,7 +43,7 @@ public class PathRequestManager : MonoBehaviour
         TryProcessNext();
     }
 
-    struct PathRequest
+    private struct PathRequest
     {
         public Vector3 PathStart;
         public Vector3 PathEnd;

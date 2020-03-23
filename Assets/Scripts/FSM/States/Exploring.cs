@@ -21,7 +21,7 @@ public class Exploring : State
 
     private Type _diet;
 
-    private float _energyLost = 5f;
+    private float _energyLost;
     private float _hungerThreshold = 50f;
 
     public Exploring(Animal animal) : base(animal.gameObject)
@@ -33,11 +33,14 @@ public class Exploring : State
             _moveSpeed = _animal.GetMoveSpeed();
             _senseRadius = _animal.GetSenseRadius();
             _diet = _animal.GetDiet();
+
+            _energyLost = _animal.GetEnergyLostPerTick();
         }
     }
 
     public override Type Tick()
     {
+
         _animal.ModifyEnergy(-_energyLost);
 
         if (IsHungry())

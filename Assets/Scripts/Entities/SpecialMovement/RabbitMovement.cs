@@ -73,6 +73,7 @@ public class RabbitMovement : MonoBehaviour
         // scale change - preparing for jump
         transform.DOScale(_groundScale, 0.5f * _jumpDuration)
                  .OnComplete(MakeJump);
+
         // correction to y-coord so it sits on the ground
         float _correctionY = _startingScale.y - 0.5f * (_startingScale.y - _groundScaleFactor.y);
         transform.DOLocalMoveY(_correctionY, 0.5f * _jumpDuration);
@@ -81,7 +82,9 @@ public class RabbitMovement : MonoBehaviour
     private void MakeJump()
     {
         // start jump with scale at roughly half jump
-        transform.DOJump(transform.position + transform.forward * _jumpLength, _jumpPower, 1, _jumpDuration);
+        // make sure that jumps into the same plane
+        Vector3 correctForward = transform.forward - Vector3.up * transform.forward.y;
+        transform.DOJump(transform.position + correctForward * _jumpLength, _jumpPower, 1, _jumpDuration);
         transform.DOScale(_airScale, 0.7f * _jumpDuration)
                  .OnComplete(LandJump);
     }

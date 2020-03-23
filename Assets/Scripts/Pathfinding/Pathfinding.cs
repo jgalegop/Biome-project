@@ -63,6 +63,8 @@ public class Pathfinding : MonoBehaviour
 
                         if (!openSet.Contains(neighbour))
                             openSet.Add(neighbour);
+                        else
+                            openSet.UpdateItem(neighbour);
                     }
                 }
             }
@@ -92,6 +94,7 @@ public class Pathfinding : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.Parent;
         }
+        path.Add(startNode); // -----------------------> this??
         Vector3[] waypoints = SimplifyPath(path);
         Array.Reverse(waypoints);
         return waypoints;
@@ -109,6 +112,10 @@ public class Pathfinding : MonoBehaviour
                 waypoints.Add(path[i - 1].WorldPos);
             }
             directionOld = directionNew;
+        }
+        if (waypoints.Count == 0) // if target is adyacent
+        {
+            waypoints.Add(path[0].WorldPos);
         }
         return waypoints.ToArray();
     }
