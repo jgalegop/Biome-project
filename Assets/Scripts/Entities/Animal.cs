@@ -25,6 +25,8 @@ namespace Entities
 
         public event Action OnAnimalDeath = delegate { };
 
+        public bool DebugModeOn { get; private set; }
+
         // IMPROVABLE
         public FiniteStateMachine FSM => GetComponent<FiniteStateMachine>();
 
@@ -103,6 +105,12 @@ namespace Entities
         {
             String[] subTypes = GetDiet().ToString().Split('.');
             return subTypes[subTypes.Length - 1];
+        }
+
+
+        public void AnimalDebugToggle()
+        {
+            DebugModeOn = !DebugModeOn;
         }
     }
 }

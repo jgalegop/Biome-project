@@ -14,6 +14,9 @@ public class Eating : State
 
     public override Type Tick()
     {
+        if (_animal.DebugModeOn)
+            Debug.Log("eating");
+
         _animal.ModifyEnergy(+_energyGained);
 
         if (_animal.TargetFood == null)

@@ -16,7 +16,6 @@ public class Exploring : State
     private float _turnSpeed = 3f;
     private float _rayDistance = 5f;
 
-    private float _moveSpeed;
     private float _senseRadius;
 
     private Type _diet;
@@ -30,7 +29,6 @@ public class Exploring : State
 
         if (_animal != null)
         {
-            _moveSpeed = _animal.GetMoveSpeed();
             _senseRadius = _animal.GetSenseRadius();
             _diet = _animal.GetDiet();
 
@@ -40,6 +38,8 @@ public class Exploring : State
 
     public override Type Tick()
     {
+        if (_animal.DebugModeOn)
+            Debug.Log("exploring");
 
         _animal.ModifyEnergy(-_energyLost);
 

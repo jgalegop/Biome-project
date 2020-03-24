@@ -5,7 +5,6 @@ using Entities;
 public class ChasingFood : State
 {
     private Animal _animal;
-    private float _moveSpeed;
 
     private Quaternion _targetFoodRotation;
     private Vector3 _targetFoodDirection;
@@ -26,7 +25,6 @@ public class ChasingFood : State
     public ChasingFood(Animal animal) : base(animal.gameObject)
     {
         _animal = animal;
-        _moveSpeed = _animal.GetMoveSpeed();
         _energyLost = _animal.GetEnergyLostPerTick();
         _debug = GameObject.FindObjectOfType<PathfindingDebug>();
 
@@ -35,6 +33,7 @@ public class ChasingFood : State
 
     public override Type Tick()
     {
+
         _animal.ModifyEnergy(-_energyLost);
 
         if (_animal.TargetFood == null)
@@ -67,6 +66,7 @@ public class ChasingFood : State
                 {
                     _targetIndex = 0;
                     _pathToTargetFood = new Vector3[0];
+
                     return null; 
                 }
                 _currentWaypoint = _pathToTargetFood[_targetIndex];
@@ -93,9 +93,7 @@ public class ChasingFood : State
         else
             transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, _turnSpeed * Time.deltaTime);
 
-
         _animal.MoveTick(_currentWaypoint);
-
 
         float newDist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);
         if (newDist < interactionDistance)
