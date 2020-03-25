@@ -28,11 +28,12 @@ namespace Entities
         public bool DebugModeOn { get; private set; }
 
         // IMPROVABLE
-        public FiniteStateMachine FSM => GetComponent<FiniteStateMachine>();
+        public FiniteStateMachine FSM;
 
         public override void Awake()
         {
             base.Awake();
+            FSM = GetComponent<FiniteStateMachine>();
             InitializeFSM();
 
             _energy = MaxEnergy;
@@ -74,6 +75,8 @@ namespace Entities
             _energy += energyLost * Time.deltaTime;
             if (_energy <= 0)
                 Die();
+            else if (_energy > 100)
+                _energy = 100;
         }
 
         public float GetEnergy()

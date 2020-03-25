@@ -17,6 +17,7 @@ public class ChasingFood : State
     private Vector3[] _pathToTargetFood = new Vector3[0];
     private Vector3 _currentWaypoint;
     private int _targetIndex = 0;
+    private Vector3 _vectorToTarget;
 
     private readonly LayerMask _obstacleLayerMask = LayerMask.GetMask("Obstacle");
 
@@ -33,7 +34,6 @@ public class ChasingFood : State
 
     public override Type Tick()
     {
-
         _animal.ModifyEnergy(-_energyLost);
 
         if (_animal.TargetFood == null)
@@ -42,13 +42,14 @@ public class ChasingFood : State
             return typeof(Exploring);
         }
 
-        // we only need to pathfind if the path is blocked, or if the target is not super close to the animal
-        Vector3 vectorToTarget = _animal.TargetFood.transform.position - transform.position;
+        return FindingFood();
+    }
 
-        if (IsPathBlocked(Vector3.Normalize(vectorToTarget), vectorToTarget.magnitude) &&
-            Vector3.Distance(_animal.TargetFood.transform.position, transform.position) > 1.414f)
+    private Type FindingFood()
+    {
+        if (NeedsPathfinding())
         {
-            // try to pathfind
+            // needs new path to target
             if (_pathToTargetFood.Length == 0)
             {
                 PathRequestManager.RequestPath(transform.position, _animal.TargetFood.transform.position, OnPathFound);
@@ -59,40 +60,32 @@ public class ChasingFood : State
 
             float waypointDist = Vector3.Distance(transform.position, _currentWaypoint);
             float dist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);
+
+            // close to end
             if (waypointDist < interactionDistance)
             {
                 _targetIndex++;
                 if (_targetIndex >= _pathToTargetFood.Length)
                 {
+                    // repeats and resets path
                     _targetIndex = 0;
                     _pathToTargetFood = new Vector3[0];
 
-                    return null; 
+                    return null;
                 }
                 _currentWaypoint = _pathToTargetFood[_targetIndex];
             }
 
             if (_debug.DebugPathfind)
-            {
-                DebugDrawPathLines(vectorToTarget);
-            }
+                DebugDrawPathLines(_vectorToTarget);
         }
         else
         {
             _currentWaypoint = _animal.TargetFood.transform.position;
         }
 
-
         // movement
-        _targetFoodDirection = Vector3.Normalize(_currentWaypoint - transform.position);
-        _targetFoodRotation = Quaternion.LookRotation(_targetFoodDirection);
-
-        // turn faster if it is closer
-        if (Vector3.Distance(transform.position, _currentWaypoint) < 2 * interactionDistance)
-            transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, 4 * _turnSpeed * Time.deltaTime);
-        else
-            transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, _turnSpeed * Time.deltaTime);
-
+        SetUpRotations();
         _animal.MoveTick(_currentWaypoint);
 
         float newDist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);
@@ -118,6 +111,28 @@ public class ChasingFood : State
     {
         Ray ray = new Ray(transform.position, dir);
         return Physics.SphereCast(ray, 0.5f, dist, _obstacleLayerMask);
+    }
+
+    private bool NeedsPathfinding()
+    {
+        // we only need to pathfind if the path is blocked, or if the target is not super close to the animal
+        _vectorToTarget = _animal.TargetFood.transform.position - transform.position;
+        bool pathBlocked = IsPathBlocked(Vector3.Normalize(_vectorToTarget), _vectorToTarget.magnitude);
+        bool tooCloseToTarget = Vector3.Distance(_animal.TargetFood.transform.position, transform.position) < 1.414f;
+        return pathBlocked && !tooCloseToTarget;   
+    }
+
+    private void SetUpRotations()
+    {
+        // movement
+        _targetFoodDirection = Vector3.Normalize(_currentWaypoint - transform.position);
+        _targetFoodRotation = Quaternion.LookRotation(_targetFoodDirection);
+
+        // turn faster if it is closer
+        if (Vector3.Distance(transform.position, _currentWaypoint) < 2 * interactionDistance)
+            transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, 4 * _turnSpeed * Time.deltaTime);
+        else
+            transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, _turnSpeed * Time.deltaTime);
     }
 
 

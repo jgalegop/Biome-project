@@ -38,9 +38,6 @@ public class Exploring : State
 
     public override Type Tick()
     {
-        if (_animal.DebugModeOn)
-            Debug.Log("exploring");
-
         _animal.ModifyEnergy(-_energyLost);
 
         if (IsHungry())
@@ -68,11 +65,17 @@ public class Exploring : State
         {
             FindRandomDestination();
         }
+        else
+        {
+            UpdateDirection();
+        }
 
         // turn towards target destination
-        transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, _turnSpeed * Time.deltaTime);
+        float turnSpeedMod = 1f; // 2 * (1.2f - Vector3.Dot(transform.forward, _direction));
+        transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, turnSpeedMod * _turnSpeed * Time.deltaTime);
 
-        if (IsForwardBlocked())
+        if (IsForwardBlocked() ||
+            Vector3.Dot(transform.forward, _direction) < 0.2f)
         {
             transform.rotation = Quaternion.Lerp(transform.rotation, _desiredRotation, 0.2f);
         }
@@ -128,14 +131,18 @@ public class Exploring : State
         // Some hard-coded distances 
         float dist1 = 2f * transform.localScale.z; // based on the forward scale
         float dist2 = dist1 * 3f;
-        Vector3 testPosition = (transform.position + (transform.forward * dist1)
-            + new Vector3(UnityEngine.Random.Range(-dist2, dist2), 1, UnityEngine.Random.Range(-dist2, dist2)));
+        Vector3 testPosition = transform.position + transform.forward * dist1
+            + new Vector3(UnityEngine.Random.Range(-dist2, dist2), 1, UnityEngine.Random.Range(-dist2, dist2));
 
         _destination = new Vector3(testPosition.x, 1f, testPosition.z);
 
+        UpdateDirection();
+    }
+
+    private void UpdateDirection()
+    {
         _direction = Vector3.Normalize(_destination.Value - transform.position);
         _direction = new Vector3(_direction.x, 0f, _direction.z);
-
         _desiredRotation = Quaternion.LookRotation(_direction);
     }
 

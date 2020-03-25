@@ -3,6 +3,7 @@ using UnityEngine;
 using System.Collections;
 using Entities;
 
+[RequireComponent(typeof(Animal))]
 public class RabbitMovement : MonoBehaviour
 {
     private float _jumpLength;
@@ -43,17 +44,29 @@ public class RabbitMovement : MonoBehaviour
         _moveSpeed = _animal.GetMoveSpeed();
 
         if (Mathf.Abs(_jumpDuration + _restTime - 1) < Mathf.Epsilon)
-        {
             _jumpLength = _moveSpeed;
-        }
         else
-        {
             Debug.LogError("Jump duration + rest time must be equal to one");
-        }
     }
 
 
     public void Tick(Vector3 destination)
+    {
+        Vector3 _direction = Vector3.Normalize(destination - transform.position);
+        _direction = new Vector3(_direction.x, 0f, _direction.z);
+        Quaternion _desiredRotation = Quaternion.LookRotation(_direction);
+
+        if (Vector3.Dot(transform.forward, _direction) < 0.8f)
+        {
+            transform.rotation = Quaternion.Lerp(transform.rotation, _desiredRotation, 0.2f);
+        }
+        else
+        {
+            Move(destination);
+        }
+    }
+
+    private void Move(Vector3 destination)
     {
         if (Vector3.Distance(transform.position, destination) >= _jumpLength)
         {

@@ -4,7 +4,6 @@ using Random = UnityEngine.Random;
 
 namespace Entities.Animals
 {
-    [RequireComponent(typeof(RabbitMovement))]
     public class Rabbit : Animal
     {
         // traits
@@ -21,7 +20,7 @@ namespace Entities.Animals
         private float _maxEnergy = 100;
 
         // movement
-        private RabbitMovement _rabbitMovement => GetComponent<RabbitMovement>();
+        private RabbitMovement _rabbitMovement;
 
 
         // class constructor
@@ -41,11 +40,16 @@ namespace Entities.Animals
             moveSpeed = _moveSpeed + Random.Range(-_moveSpeedVar, _moveSpeedVar);
             senseRadius = _senseRadius + Random.Range(-_senseRadiusVar, _senseRadiusVar);
             base.Awake();
+
+            _rabbitMovement = GetComponent<RabbitMovement>();
         }
 
         public override void MoveTick(Vector3 destination)
         {
-            _rabbitMovement.Tick(destination);
+            if (_rabbitMovement != null)
+                _rabbitMovement.Tick(destination); 
+            else
+                base.MoveTick(destination);
         }
 
 
