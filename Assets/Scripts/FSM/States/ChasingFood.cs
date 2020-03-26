@@ -70,7 +70,6 @@ public class ChasingFood : State
                     // repeats and resets path
                     _targetIndex = 0;
                     _pathToTargetFood = new Vector3[0];
-
                     return null;
                 }
                 _currentWaypoint = _pathToTargetFood[_targetIndex];
@@ -82,6 +81,8 @@ public class ChasingFood : State
         else
         {
             _currentWaypoint = _animal.TargetFood.transform.position;
+            // waypoint correction to y-pos
+            _currentWaypoint += Vector3.up * (1f - _currentWaypoint.y); // ANIMAL PLANE
         }
 
         // movement

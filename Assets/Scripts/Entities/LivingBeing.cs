@@ -24,7 +24,7 @@ namespace Entities
             Destroy(gameObject);
         }
 
-        public virtual void BeingEaten() { }
+        public virtual void BeingEaten() { } 
     }
 }
 

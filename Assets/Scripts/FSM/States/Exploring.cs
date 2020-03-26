@@ -55,6 +55,26 @@ public class Exploring : State
             }
         }
 
+        if (WantsToReproduce())
+        {
+            var mateTarget = NearbyMate();
+            if (mateTarget != null)
+            {
+                if (mateTarget.GetReproductiveUrge() &&
+                    mateTarget.GetState() == typeof(Exploring) || mateTarget.GetState() == typeof(GoingForMate))
+                {
+                    Debug.Log(gameObject.name + " going for mate");
+                    _animal.SetTargetMate(mateTarget);
+                    _destination = null;
+                    return typeof(GoingForMate);
+                }   
+            }
+            else
+            {
+                return KeepExploring();
+            }
+        }
+
         return KeepExploring();
     }
 
@@ -125,6 +145,40 @@ public class Exploring : State
 
         return closestFood;
     }
+
+
+    private bool WantsToReproduce()
+    {
+        return _animal.GetReproductiveUrge();
+    }
+
+    private Animal NearbyMate()
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _senseRadius);
+
+        // filter all with same animal specie type
+        Collider[] nearbySpecieColliders =
+            Array.FindAll(nearbyColliders, c => c.gameObject.GetComponent<Animal>()?.GetType() == _animal.GetType());
+        Animal[] potentialMates =
+            Array.ConvertAll(nearbySpecieColliders, c => c.gameObject.GetComponent<Animal>());
+
+        // check which one's closer and target it
+        Animal closestMate = null;
+        float smallestDist = _senseRadius + 1;
+        foreach (Animal a in potentialMates)
+        {
+            float dist = Vector3.Distance(transform.position, a.transform.position);
+            if (dist < smallestDist &&
+                dist > Mathf.Epsilon)
+            {
+                closestMate = a;
+                smallestDist = dist;
+            }
+        }
+
+        return closestMate;
+    }
+
 
     private void FindRandomDestination()
     {

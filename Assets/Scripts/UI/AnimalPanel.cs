@@ -33,6 +33,15 @@ public class AnimalPanel : MonoBehaviour
     [SerializeField]
     private TMP_Text _stateText = null;
 
+    [SerializeField]
+    private Image _reproductiveUrgeImage = null;
+
+    [SerializeField]
+    private Sprite _repUrgeOn = null;
+
+    [SerializeField]
+    private Sprite _repUrgeOff = null;
+
     private Animal _boundAnimal;
     private Vector3 _animalGraphicScale;
 
@@ -49,6 +58,7 @@ public class AnimalPanel : MonoBehaviour
         if (_boundAnimal != null)
         {
             _boundAnimal.OnAnimalDeath -= HandleAnimalDeath;
+            _boundAnimal.OnAnimalWithReproductiveUrge -= UpdateReproductiveUrgeIcon;
         }
 
         _boundAnimal = animal;
@@ -56,6 +66,7 @@ public class AnimalPanel : MonoBehaviour
         if (_boundAnimal != null)
         {
             _boundAnimal.OnAnimalDeath += HandleAnimalDeath;
+            _boundAnimal.OnAnimalWithReproductiveUrge += UpdateReproductiveUrgeIcon;
             DisplayStats(_boundAnimal);
             _animalPanel.SetActive(true);
 
@@ -84,6 +95,7 @@ public class AnimalPanel : MonoBehaviour
         _moveSpeedNumber.SetText(animal.GetMoveSpeed().ToString("F1") + " m/s");
         _senseRadiusNumber.SetText(animal.GetSenseRadius().ToString("F1") + " m");
         _dietText.SetText(animal.GetDietText());
+        UpdateReproductiveUrgeIcon();
     }
 
     private void UpdatePanel()
@@ -96,6 +108,18 @@ public class AnimalPanel : MonoBehaviour
         Vector3 scaledLocalScale = Vector3.Scale(_boundAnimal.transform.localScale, _animalGraphicScale);
         _animalGraphic.localScale = scaledLocalScale;
         _stateText.SetText("(" + _boundAnimal.GetStateName() + ")");
+    }
+
+    private void UpdateReproductiveUrgeIcon()
+    {
+        if (_boundAnimal.GetReproductiveUrge())
+        {
+            _reproductiveUrgeImage.sprite = _repUrgeOn;
+        }
+        else
+        {
+            _reproductiveUrgeImage.sprite = _repUrgeOff;
+        }
     }
 
     private void HandleAnimalDeath()
