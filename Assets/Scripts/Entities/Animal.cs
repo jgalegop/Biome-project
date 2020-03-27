@@ -186,6 +186,14 @@ namespace Entities
                 Die();
         }
 
+        public void AnimalIsYoung()
+        {
+            DefaultScale *= 0.5f;
+            transform.position += Vector3.up * (0.5f * DefaultScale.y - transform.position.y);
+            moveSpeed *= 0.5f;
+            _reproductiveUrge = null;
+        }
+
 
 
 

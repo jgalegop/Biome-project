@@ -6,7 +6,6 @@ using DG.Tweening;
 public class Mating : State
 {
     private float _energyCost = 5f;
-    private Vector3 _centerPosition;
 
     private float _jumpPower = 1f;
     private readonly float _jumpDuration = 0.5f;
@@ -38,6 +37,7 @@ public class Mating : State
             if (!_animal.TargetMate.GetReproductiveUrge())
             {
                 _numberOfJumps = 0;
+
                 return typeof(Exploring);
             }
         }
@@ -64,16 +64,12 @@ public class Mating : State
 
     private void SetScales()
     {
-        // start jump
         _groundScale = Vector3.Scale(_animal.DefaultScale, _groundScaleFactor);
         _airScale = Vector3.Scale(_animal.DefaultScale, _airScaleFactor);
     }
 
     private void FaceMate()
     {
-        // facing each other
-        // _centerPosition = 0.5f * (transform.position + _animal.TargetMate.transform.position);
-        // _centerPosition += Vector3.up * (1f - _centerPosition.y);
         transform.rotation = Quaternion.LookRotation(_animal.TargetMate.transform.position - transform.position);
     }
 

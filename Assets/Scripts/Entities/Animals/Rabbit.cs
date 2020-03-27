@@ -7,8 +7,8 @@ namespace Entities.Animals
     public class Rabbit : Animal
     {
         // traits
-        private readonly float _moveSpeed = 2.5f;
-        private readonly float _senseRadius = 10f;
+        private float _moveSpeed = 2.5f;
+        private float _senseRadius = 10f;
 
         private readonly float _moveSpeedVar = 1f;
         private readonly float _senseRadiusVar = 3f;
@@ -24,8 +24,11 @@ namespace Entities.Animals
 
 
         // class constructor
-        public Rabbit()
+        public Rabbit(float moveSpeed, float senseRadius)
         {
+            _moveSpeed = moveSpeed;
+            _senseRadius = senseRadius;
+
             // constants since construction
             diet = _diet;
 
