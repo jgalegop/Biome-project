@@ -23,6 +23,7 @@ namespace Entities
         private float _repUrgeTime = 30f;
         private float _repUrgeTimeVar = 15f;
 
+        public Vector3 DefaultScale { get; private set; }
         public float MaxEnergy { get; protected set; }
 
         public LivingBeing TargetFood { get; private set; }
@@ -44,6 +45,7 @@ namespace Entities
             InitializeFSM();
 
             _energy = MaxEnergy;
+            DefaultScale = transform.localScale;
 
             if (IsAdult())
                 StartReproductiveUrge();

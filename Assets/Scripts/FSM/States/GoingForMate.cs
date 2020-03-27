@@ -54,10 +54,11 @@ public class GoingForMate : State
     {
         bool targetInexistent = _animal.TargetMate == null;
         bool targetAvailable = _availableStates.Contains(_animal.TargetMate?.GetState());
+        bool targetHasNoTarget = _animal.TargetMate.TargetMate == null;
         bool targetMatingWithOther = _animal.TargetMate?.GetState() == typeof(Mating) && 
                                      _animal.TargetMate?.TargetMate.gameObject != gameObject;
 
-        return targetInexistent || !targetAvailable || targetMatingWithOther;
+        return targetInexistent || !targetAvailable || targetHasNoTarget || targetMatingWithOther;
     }
 
     private Type FindingMate()
@@ -96,7 +97,8 @@ public class GoingForMate : State
         }
         else
         {
-            _currentWaypoint = _animal.TargetMate.transform.position;
+            // in direction of target mate, but slightly tilted towards current position, so that it doesn't jump
+            _currentWaypoint = (0.25f * _animal.TargetMate.transform.position + 0.75f * transform.position);
             // waypoint correction to y-pos
             _currentWaypoint += Vector3.up * (1f - _currentWaypoint.y); // ANIMAL PLANE
         }

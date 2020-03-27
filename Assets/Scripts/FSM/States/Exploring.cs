@@ -63,7 +63,7 @@ public class Exploring : State
                 if (mateTarget.GetReproductiveUrge() &&
                     mateTarget.GetState() == typeof(Exploring) || mateTarget.GetState() == typeof(GoingForMate))
                 {
-                    Debug.Log(gameObject.name + " going for mate");
+                    Debug.Log(gameObject.name + " going for mate " + mateTarget.gameObject.name);
                     _animal.SetTargetMate(mateTarget);
                     _destination = null;
                     return typeof(GoingForMate);

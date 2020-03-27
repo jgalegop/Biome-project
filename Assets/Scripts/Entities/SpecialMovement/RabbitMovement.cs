@@ -22,7 +22,7 @@ public class RabbitMovement : MonoBehaviour
     [Tooltip("Local scale on air is default scale multiplied component by component by this vector factor")]
     private Vector3 _airScaleFactor = new Vector3(0.7f, 1.3f, 0.7f);
 
-    bool isJumping = false;
+    private bool _isJumping = false;
 
     private Vector3 _startingScale;
     private Vector3 _groundScale;
@@ -70,7 +70,7 @@ public class RabbitMovement : MonoBehaviour
     {
         if (Vector3.Distance(transform.position, destination) >= _jumpLength)
         {
-            if (isJumping)
+            if (_isJumping)
                 return;
             Jump();
         }
@@ -82,7 +82,7 @@ public class RabbitMovement : MonoBehaviour
 
     private void Jump()
     {   
-        isJumping = true;
+        _isJumping = true;
         // scale change - preparing for jump
         transform.DOScale(_groundScale, 0.5f * _jumpDuration)
                  .OnComplete(MakeJump);
@@ -126,12 +126,12 @@ public class RabbitMovement : MonoBehaviour
     IEnumerator RestAfterJump()
     {
         yield return new WaitForSeconds(_restTime);
-        isJumping = false;
+        _isJumping = false;
     }
 
     public bool GetIsJumping()
     {
-        return isJumping;
+        return _isJumping;
     }
 
     private void OnDestroy()

@@ -5,7 +5,8 @@ using Entities;
 public class PlantSpawner : MonoBehaviour
 {
     [SerializeField]
-    [Range(0, 1)] private float _chanceToGrowPerSecond = 0.2f;
+    [Tooltip("Chance per second to create a plant")]
+    [Range(0, 1)] private float _chanceToGrowPerSecond = 0.5f;
 
     [SerializeField]
     private LivingBeing _plantPrefab = null;
