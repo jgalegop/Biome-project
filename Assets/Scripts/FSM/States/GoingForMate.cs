@@ -11,7 +11,7 @@ public class GoingForMate : State
     private Vector3 _targetMateDirection;
     private float _turnSpeed = 3f;
 
-    private readonly float interactionDistance = 3f;
+    private readonly float interactionDistance = 2f;
 
     private float _energyLost;
 
@@ -19,7 +19,6 @@ public class GoingForMate : State
     private Vector3 _currentWaypoint;
     private int _targetIndex = 0;
     private Vector3 _vectorToTarget;
-    private Vector3 _previousTargetPos;
     private List<Type> _availableStates;
 
     private readonly LayerMask _obstacleLayerMask = LayerMask.GetMask("Obstacle");

@@ -17,12 +17,13 @@ namespace Entities.Animals
         private readonly Type _diet = typeof(Plant);
 
         // energy
-        private float _maxEnergy = 100;
+        private readonly float _maxEnergy = 100;
 
         // movement
         private RabbitMovement _rabbitMovement;
 
 
+        /*
         // class constructor
         public Rabbit(float moveSpeed, float senseRadius)
         {
@@ -34,14 +35,21 @@ namespace Entities.Animals
 
             // variable
             MaxEnergy = _maxEnergy;
+            
         }
-
+        */
 
         // called in Awake so each object with this class has different initial values
         public override void Awake()
         {
+            // constants since construction
+            diet = _diet;
+            MaxEnergy = _maxEnergy;
+
+            // variables
             moveSpeed = _moveSpeed + Random.Range(-_moveSpeedVar, _moveSpeedVar);
             senseRadius = _senseRadius + Random.Range(-_senseRadiusVar, _senseRadiusVar);
+
             base.Awake();
 
             _rabbitMovement = GetComponent<RabbitMovement>();

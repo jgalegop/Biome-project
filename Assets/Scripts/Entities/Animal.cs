@@ -49,6 +49,7 @@ namespace Entities
 
             if (IsAdult())
                 StartReproductiveUrge();
+            
         }
 
         private void InitializeFSM()
@@ -106,6 +107,7 @@ namespace Entities
 
         public void StartReproductiveUrge()
         {
+            _reproductiveUrge = false;
             StartCoroutine(ReproductiveUrgeRoutine());
         }
 
@@ -137,6 +139,7 @@ namespace Entities
         {
             return _reproductiveUrge != null;
         }
+
 
         public void AnimalIsNotAdult()
         {
