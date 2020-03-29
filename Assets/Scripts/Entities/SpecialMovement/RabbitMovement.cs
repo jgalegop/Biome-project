@@ -33,9 +33,7 @@ public class RabbitMovement : MonoBehaviour
 
     private void Awake()
     {
-        _startingScale = transform.localScale;
-        _groundScale = Vector3.Scale(_startingScale, _groundScaleFactor);
-        _airScale = Vector3.Scale(_startingScale, _airScaleFactor);
+        SetDefaultScale(1f);
     }
 
     private void Start()
@@ -78,6 +76,13 @@ public class RabbitMovement : MonoBehaviour
         {
             transform.Translate(Vector3.forward * _moveSpeed * Time.deltaTime);
         }
+    }
+
+    public void SetDefaultScale(float factor)
+    {
+        _startingScale = factor * transform.localScale;
+        _groundScale = Vector3.Scale(_startingScale, _groundScaleFactor);
+        _airScale = Vector3.Scale(_startingScale, _airScaleFactor);
     }
 
     private void Jump()

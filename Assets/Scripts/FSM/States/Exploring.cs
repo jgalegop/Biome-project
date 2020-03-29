@@ -60,6 +60,9 @@ public class Exploring : State
             var mateTarget = NearbyMate();
             if (mateTarget != null)
             {
+                if (!mateTarget.IsAdult())
+                    return KeepExploring();
+
                 if (mateTarget.GetReproductiveUrge() &&
                     mateTarget.GetState() == typeof(Exploring) || mateTarget.GetState() == typeof(GoingForMate))
                 {
@@ -148,8 +151,11 @@ public class Exploring : State
 
 
     private bool WantsToReproduce()
-    {
-        return _animal.GetReproductiveUrge();
+    {;
+        if (_animal.IsAdult())
+            return _animal.GetReproductiveUrge();
+        else
+            return false;
     }
 
     private Animal NearbyMate()

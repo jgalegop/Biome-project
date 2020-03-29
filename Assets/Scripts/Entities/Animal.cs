@@ -11,7 +11,7 @@ namespace Entities
     /// Inherits from livingbeing in order to spawn and kill an animal entity.
     /// Controls energy and defines different animal traits (move speed, sense radius, diet...)
     /// </summary>
-    [RequireComponent(typeof(FiniteStateMachine))]
+    [RequireComponent(typeof(FiniteStateMachine), typeof(AnimalFactory))]
     public abstract class Animal : LivingBeing
     {
         protected float moveSpeed;
@@ -27,29 +27,41 @@ namespace Entities
         public float MaxEnergy { get; protected set; }
 
         public LivingBeing TargetFood { get; private set; }
-
         public Animal TargetMate { get; private set; }
 
         public event Action OnAnimalDeath = delegate { };
-
         public event Action OnAnimalWithReproductiveUrge = delegate { };
+
+        public AnimalFactory AnimalSpawner { get; private set; }
 
         public bool DebugModeOn { get; private set; }
 
         public FiniteStateMachine FSM { get; private set; }
 
+
         public override void Awake()
         {
-            base.Awake();
+            Spawn();
+        }
+
+        public override void Spawn()
+        {
+            base.Spawn();
             FSM = GetComponent<FiniteStateMachine>();
             InitializeFSM();
 
             _energy = MaxEnergy;
+
+            Debug.Log("Spawn");
+
             DefaultScale = transform.localScale;
+            Debug.Log(DefaultScale);
 
             if (IsAdult())
                 StartReproductiveUrge();
-            
+
+            AnimalSpawner = GetComponent<AnimalFactory>();
+            AnimalSpawner.SetInstance(gameObject);
         }
 
         private void InitializeFSM()
@@ -70,6 +82,11 @@ namespace Entities
         {
             OnAnimalDeath?.Invoke();
             base.Die();
+        }
+
+        public virtual AnimalFactory GetFactory()
+        {
+            return FindObjectOfType<AnimalFactory>();
         }
 
         public void SetTargetFood(LivingBeing target)
@@ -189,15 +206,47 @@ namespace Entities
                 Die();
         }
 
-        public void AnimalIsYoung()
+        public virtual void AnimalIsYoung()
         {
-            DefaultScale *= 0.5f;
+            Debug.Log("AnimalIsYoung");
+            Debug.Log(DefaultScale);
+            transform.localScale = DefaultScale * 0.5f;
+            DefaultScale = transform.localScale;
+            Debug.Log(DefaultScale);
+
             transform.position += Vector3.up * (0.5f * DefaultScale.y - transform.position.y);
             moveSpeed *= 0.5f;
             _reproductiveUrge = null;
+            StartCoroutine(GrowIntoAdult());
         }
 
+        private IEnumerator GrowIntoAdult()
+        {
+            float adultTime = UnityEngine.Random.Range(35, 45);
+            yield return new WaitForSeconds(adultTime);
+            AnimalIsAdult();
+        }
 
+        public virtual void AnimalIsAdult()
+        {
+            if (!IsAdult())
+            {
+                transform.localScale = DefaultScale * 2f;
+                DefaultScale = transform.localScale;
+                transform.position += Vector3.up * (0.5f * DefaultScale.y - transform.position.y);
+                moveSpeed *= 2f;
+            }
+            StartReproductiveUrge();
+        }
+
+        public void SpawnOffspring()
+        {
+            for (int i = 0; i < UnityEngine.Random.Range(1,4); i++)
+            {
+                Animal newAnimal = AnimalSpawner.GetNewInstance().GetComponent<Animal>();
+                newAnimal.AnimalIsYoung();
+            }
+        }
 
 
         public void AnimalDebugToggle()

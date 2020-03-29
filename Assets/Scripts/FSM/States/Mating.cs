@@ -18,6 +18,8 @@ public class Mating : State
     private readonly int _maxNumberOfJumps = 3;
     private int _numberOfJumps = 0;
 
+    private AnimalFactory _animalSpawner;
+
     private Animal _animal;
     public Mating(Animal animal) : base(animal.gameObject)
     {
@@ -28,8 +30,12 @@ public class Mating : State
     {
         _animal.ModifyEnergy(-_energyCost);
 
-        if (_animal.TargetMate == null)
+        if (_animal.TargetMate == null ||
+            !_animal.TargetMate.IsAdult())
+        {
             return typeof(Exploring);
+        }
+            
 
         if (_numberOfJumps >= _maxNumberOfJumps)
         {
@@ -37,6 +43,8 @@ public class Mating : State
             if (!_animal.TargetMate.GetReproductiveUrge())
             {
                 _numberOfJumps = 0;
+
+                _animal.SpawnOffspring();
 
                 return typeof(Exploring);
             }

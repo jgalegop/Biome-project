@@ -12,6 +12,11 @@ namespace Entities
 
         public virtual void Awake()
         {
+            Spawn();
+        }
+
+        public virtual void Spawn()
+        {
             float startingAngle = Random.Range(-180, 180);
             transform.rotation = Quaternion.Euler(0, startingAngle, 0);
             transform.position += Vector3.up * (1 - transform.position.y);

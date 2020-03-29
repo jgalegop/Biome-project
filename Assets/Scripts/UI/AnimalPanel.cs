@@ -44,6 +44,7 @@ public class AnimalPanel : MonoBehaviour
 
     private Animal _boundAnimal;
     private Vector3 _animalGraphicScale;
+    private Color _reproductiveUrgeImageColor;
 
     private void Awake()
     {
@@ -51,6 +52,8 @@ public class AnimalPanel : MonoBehaviour
         _panelImage.transform.localScale = Vector3.zero;
 
         _animalPanel.SetActive(false);
+
+        _reproductiveUrgeImageColor = _reproductiveUrgeImage.color;
     }
 
     public void Bind(Animal animal)
@@ -112,14 +115,20 @@ public class AnimalPanel : MonoBehaviour
 
     private void UpdateReproductiveUrgeIcon()
     {
-        if (_boundAnimal.GetReproductiveUrge())
+        if (_boundAnimal.IsAdult())
         {
-            _reproductiveUrgeImage.sprite = _repUrgeOn;
+            _reproductiveUrgeImage.color = _reproductiveUrgeImageColor;
+            if (_boundAnimal.GetReproductiveUrge())
+                _reproductiveUrgeImage.sprite = _repUrgeOn;
+            else
+                _reproductiveUrgeImage.sprite = _repUrgeOff;
         }
         else
         {
-            _reproductiveUrgeImage.sprite = _repUrgeOff;
+            _reproductiveUrgeImage.sprite = null;
+            _reproductiveUrgeImage.color = Color.clear;
         }
+        
     }
 
     private void HandleAnimalDeath()

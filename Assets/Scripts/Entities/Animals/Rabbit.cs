@@ -42,6 +42,11 @@ namespace Entities.Animals
         // called in Awake so each object with this class has different initial values
         public override void Awake()
         {
+            Spawn();
+        }
+
+        public override void Spawn()
+        {
             // constants since construction
             diet = _diet;
             MaxEnergy = _maxEnergy;
@@ -50,7 +55,7 @@ namespace Entities.Animals
             moveSpeed = _moveSpeed + Random.Range(-_moveSpeedVar, _moveSpeedVar);
             senseRadius = _senseRadius + Random.Range(-_senseRadiusVar, _senseRadiusVar);
 
-            base.Awake();
+            base.Spawn();
 
             _rabbitMovement = GetComponent<RabbitMovement>();
         }
@@ -61,6 +66,18 @@ namespace Entities.Animals
                 _rabbitMovement.Tick(destination); 
             else
                 base.MoveTick(destination);
+        }
+
+        public override void AnimalIsYoung()
+        {
+            _rabbitMovement.SetDefaultScale(0.5f);
+            base.AnimalIsYoung();
+        }
+
+        public override void AnimalIsAdult()
+        {
+            _rabbitMovement.SetDefaultScale(2f);
+            base.AnimalIsAdult();
         }
 
 
