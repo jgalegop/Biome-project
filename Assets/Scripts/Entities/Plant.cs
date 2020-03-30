@@ -13,7 +13,7 @@ namespace Entities
         {
             Vector3 currentScale = transform.localScale;
             transform.localScale = currentScale - Vector3.one * decaySpeed * Time.deltaTime;
-            transform.position -= 0.5f * Vector3.up * decaySpeed * Time.deltaTime;
+            transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
             if (transform.localScale.x < 0 ||
                 transform.localScale.y < 0 ||
                 transform.localScale.z < 0)

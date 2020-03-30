@@ -33,20 +33,10 @@ public class RabbitMovement : MonoBehaviour
 
     private void Awake()
     {
-        SetDefaultScale(1f);
-    }
-
-    private void Start()
-    {
+        SetDefaultScale(transform.localScale);
         _animal = GetComponent<Animal>();
-        _moveSpeed = _animal.GetMoveSpeed();
-
-        if (Mathf.Abs(_jumpDuration + _restTime - 1) < Mathf.Epsilon)
-            _jumpLength = _moveSpeed;
-        else
-            Debug.LogError("Jump duration + rest time must be equal to one");
+        SetMoveParams();
     }
-
 
     public void Tick(Vector3 destination)
     {
@@ -78,11 +68,21 @@ public class RabbitMovement : MonoBehaviour
         }
     }
 
-    public void SetDefaultScale(float factor)
+    public void SetDefaultScale(Vector3 startingScale)
     {
-        _startingScale = factor * transform.localScale;
+        _startingScale = startingScale;
         _groundScale = Vector3.Scale(_startingScale, _groundScaleFactor);
         _airScale = Vector3.Scale(_startingScale, _airScaleFactor);
+    }
+
+    public void SetMoveParams()
+    {
+        _moveSpeed = _animal.GetMoveSpeed();
+
+        if (Mathf.Abs(_jumpDuration + _restTime - 1) < Mathf.Epsilon)
+            _jumpLength = _moveSpeed;
+        else
+            Debug.LogError("Jump duration + rest time must be equal to one");
     }
 
     private void Jump()
@@ -93,7 +93,7 @@ public class RabbitMovement : MonoBehaviour
                  .OnComplete(MakeJump);
 
         // correction to y-coord so it sits on the ground
-        float _correctionY = _startingScale.y - 0.5f * (_startingScale.y - _groundScaleFactor.y);
+        float _correctionY = _animal.GroundYPos + 0.5f * _groundScale.y;
         transform.DOLocalMoveY(_correctionY, 0.5f * _jumpDuration);
     }
 
@@ -120,7 +120,7 @@ public class RabbitMovement : MonoBehaviour
         transform.DOScale(_startingScale, 0.1f)
                  .OnComplete(NotOnAir);
         // correction to y-coord
-        transform.DOLocalMoveY(_startingScale.y, 0.1f);
+        transform.DOLocalMoveY(_animal.GroundYPos + 0.5f * _startingScale.y, 0.1f);
     }
 
     private void NotOnAir()

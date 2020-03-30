@@ -18,8 +18,6 @@ public class Mating : State
     private readonly int _maxNumberOfJumps = 3;
     private int _numberOfJumps = 0;
 
-    private AnimalFactory _animalSpawner;
-
     private Animal _animal;
     public Mating(Animal animal) : base(animal.gameObject)
     {
@@ -65,15 +63,15 @@ public class Mating : State
         SetScales();
 
         // variation in jump power
-        _jumpPower += UnityEngine.Random.Range(-0.2f, 0.4f);
+        _jumpPower += UnityEngine.Random.Range(-0.2f, 0.3f);
 
         Jump();
     }
 
     private void SetScales()
     {
-        _groundScale = Vector3.Scale(_animal.DefaultScale, _groundScaleFactor);
-        _airScale = Vector3.Scale(_animal.DefaultScale, _airScaleFactor);
+        _groundScale = Vector3.Scale(_animal.AdultScale, _groundScaleFactor);
+        _airScale = Vector3.Scale(_animal.AdultScale, _airScaleFactor);
     }
 
     private void FaceMate()
@@ -89,7 +87,7 @@ public class Mating : State
                  .OnComplete(MakeJump);
 
         // correction to y-coord so it sits on the ground
-        float _correctionY = _animal.DefaultScale.y - 0.5f * (_animal.DefaultScale.y - _groundScaleFactor.y);
+        float _correctionY = _animal.AdultScale.y - 0.5f * (_animal.AdultScale.y - _groundScaleFactor.y);
         transform.DOLocalMoveY(_correctionY, 0.5f * _jumpDuration);
     }
 
@@ -112,16 +110,16 @@ public class Mating : State
     private void Recover()
     {
         // recover original configuration
-        transform.DOScale(_animal.DefaultScale, 0.1f)
+        transform.DOScale(_animal.AdultScale, 0.1f)
                  .OnComplete(NotOnAir);
         // correction to y-coord
-        transform.DOLocalMoveY(_animal.DefaultScale.y, 0.1f);
+        transform.DOLocalMoveY(_animal.AdultScale.y, 0.1f);
     }
 
     private void NotOnAir()
     {
         // virtually does nothing (rest time)
-        transform.DOScale(_animal.DefaultScale, _restTime).OnComplete(ResetIsJumping);
+        transform.DOScale(_animal.AdultScale, _restTime).OnComplete(ResetIsJumping);
     }
 
     private void ResetIsJumping()

@@ -8,7 +8,7 @@ public class Exploring : State
     private Quaternion _desiredRotation;
     private Vector3 _direction;
 
-    private readonly LayerMask _obstacleLayerMask = LayerMask.GetMask("Obstacle", "Animal");
+    private readonly LayerMask _obstacleLayerMask = LayerMask.GetMask("Obstacle");
 
     private Animal _animal;
 
@@ -66,7 +66,7 @@ public class Exploring : State
                 if (mateTarget.GetReproductiveUrge() &&
                     mateTarget.GetState() == typeof(Exploring) || mateTarget.GetState() == typeof(GoingForMate))
                 {
-                    Debug.Log(gameObject.name + " going for mate " + mateTarget.gameObject.name);
+                    //Debug.Log(gameObject.name + " going for mate " + mateTarget.gameObject.name);
                     _animal.SetTargetMate(mateTarget);
                     _destination = null;
                     return typeof(GoingForMate);
@@ -93,9 +93,7 @@ public class Exploring : State
             UpdateDirection();
         }
 
-        // turn towards target destination
-        float turnSpeedMod = 1f; // 2 * (1.2f - Vector3.Dot(transform.forward, _direction));
-        transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, turnSpeedMod * _turnSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.Slerp(transform.rotation, _desiredRotation, _turnSpeed * Time.deltaTime);
 
         if (IsForwardBlocked() ||
             Vector3.Dot(transform.forward, _direction) < 0.2f)
@@ -111,6 +109,7 @@ public class Exploring : State
 
         while (IsPathBlocked())
         {
+            // I BELIEVE WHEN BORN THEY COULD GET STUCK HERE
             FindRandomDestination();
         }
 
@@ -194,7 +193,7 @@ public class Exploring : State
         Vector3 testPosition = transform.position + transform.forward * dist1
             + new Vector3(UnityEngine.Random.Range(-dist2, dist2), 1, UnityEngine.Random.Range(-dist2, dist2));
 
-        _destination = new Vector3(testPosition.x, 1f, testPosition.z);
+        _destination = new Vector3(testPosition.x, _animal.GroundYPos, testPosition.z);
 
         UpdateDirection();
     }

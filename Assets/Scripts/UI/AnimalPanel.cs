@@ -62,6 +62,7 @@ public class AnimalPanel : MonoBehaviour
         {
             _boundAnimal.OnAnimalDeath -= HandleAnimalDeath;
             _boundAnimal.OnAnimalWithReproductiveUrge -= UpdateReproductiveUrgeIcon;
+            _boundAnimal.OnAnimalGrowToAdult -= DisplayStats;
         }
 
         _boundAnimal = animal;
@@ -70,7 +71,9 @@ public class AnimalPanel : MonoBehaviour
         {
             _boundAnimal.OnAnimalDeath += HandleAnimalDeath;
             _boundAnimal.OnAnimalWithReproductiveUrge += UpdateReproductiveUrgeIcon;
-            DisplayStats(_boundAnimal);
+            _boundAnimal.OnAnimalGrowToAdult += DisplayStats;
+
+            DisplayStats();
             _animalPanel.SetActive(true);
 
             if (DOTween.IsTweening(_panelImage.transform))
@@ -93,11 +96,11 @@ public class AnimalPanel : MonoBehaviour
             UpdatePanel();
     }
 
-    private void DisplayStats(Animal animal)
+    private void DisplayStats()
     {
-        _moveSpeedNumber.SetText(animal.GetMoveSpeed().ToString("F1") + " m/s");
-        _senseRadiusNumber.SetText(animal.GetSenseRadius().ToString("F1") + " m");
-        _dietText.SetText(animal.GetDietText());
+        _moveSpeedNumber.SetText(_boundAnimal.GetMoveSpeed().ToString("F1") + " m/s");
+        _senseRadiusNumber.SetText(_boundAnimal.GetSenseRadius().ToString("F1") + " m");
+        _dietText.SetText(_boundAnimal.GetDietText());
         UpdateReproductiveUrgeIcon();
     }
 
@@ -128,8 +131,8 @@ public class AnimalPanel : MonoBehaviour
             _reproductiveUrgeImage.sprite = null;
             _reproductiveUrgeImage.color = Color.clear;
         }
-        
     }
+
 
     private void HandleAnimalDeath()
     {

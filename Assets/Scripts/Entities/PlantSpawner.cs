@@ -75,7 +75,7 @@ public class PlantSpawner : MonoBehaviour
             yield return null;
             t += _growSpeed * Time.deltaTime;
             targetPlant.transform.localScale = Vector3.Lerp(Vector3.zero, defaultScale, t);
-            targetPlant.transform.position += Vector3.up * (Mathf.Lerp(1f - 0.5f * defaultScale.y, 1f, t) - targetPlant.transform.position.y);
+            targetPlant.transform.position += Vector3.up * (targetPlant.GroundYPos + 0.5f * targetPlant.transform.localScale.y - targetPlant.transform.position.y);
         }
         targetPlantCollider.enabled = true;
     }

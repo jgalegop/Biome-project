@@ -10,9 +10,6 @@ namespace Entities.Animals
         private float _moveSpeed = 2.5f;
         private float _senseRadius = 10f;
 
-        private readonly float _moveSpeedVar = 1f;
-        private readonly float _senseRadiusVar = 3f;
-
         // diet
         private readonly Type _diet = typeof(Plant);
 
@@ -23,42 +20,19 @@ namespace Entities.Animals
         private RabbitMovement _rabbitMovement;
 
 
-        /*
-        // class constructor
-        public Rabbit(float moveSpeed, float senseRadius)
-        {
-            _moveSpeed = moveSpeed;
-            _senseRadius = senseRadius;
-
-            // constants since construction
-            diet = _diet;
-
-            // variable
-            MaxEnergy = _maxEnergy;
-            
-        }
-        */
-
-        // called in Awake so each object with this class has different initial values
-        public override void Awake()
-        {
-            Spawn();
-        }
-
         public override void Spawn()
         {
-            // constants since construction
             diet = _diet;
             MaxEnergy = _maxEnergy;
 
-            // variables
-            moveSpeed = _moveSpeed + Random.Range(-_moveSpeedVar, _moveSpeedVar);
-            senseRadius = _senseRadius + Random.Range(-_senseRadiusVar, _senseRadiusVar);
+            SetTraits(_moveSpeed, _senseRadius);
 
             base.Spawn();
 
             _rabbitMovement = GetComponent<RabbitMovement>();
         }
+
+
 
         public override void MoveTick(Vector3 destination)
         {
@@ -70,14 +44,16 @@ namespace Entities.Animals
 
         public override void AnimalIsYoung()
         {
-            _rabbitMovement.SetDefaultScale(0.5f);
             base.AnimalIsYoung();
+            _rabbitMovement.SetDefaultScale(YoungScale);
+            _rabbitMovement.SetMoveParams();
         }
 
         public override void AnimalIsAdult()
         {
-            _rabbitMovement.SetDefaultScale(2f);
             base.AnimalIsAdult();
+            _rabbitMovement.SetDefaultScale(AdultScale);
+            _rabbitMovement.SetMoveParams();
         }
 
 

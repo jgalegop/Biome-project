@@ -23,7 +23,9 @@ namespace Entities
         private float _repUrgeTime = 30f;
         private float _repUrgeTimeVar = 15f;
 
-        public Vector3 DefaultScale { get; private set; }
+        public Vector3 AdultScale { get; private set; }
+        public Vector3 YoungScale { get; private set; }
+
         public float MaxEnergy { get; protected set; }
 
         public LivingBeing TargetFood { get; private set; }
@@ -31,6 +33,7 @@ namespace Entities
 
         public event Action OnAnimalDeath = delegate { };
         public event Action OnAnimalWithReproductiveUrge = delegate { };
+        public event Action OnAnimalGrowToAdult = delegate { };
 
         public AnimalFactory AnimalSpawner { get; private set; }
 
@@ -38,11 +41,6 @@ namespace Entities
 
         public FiniteStateMachine FSM { get; private set; }
 
-
-        public override void Awake()
-        {
-            Spawn();
-        }
 
         public override void Spawn()
         {
@@ -52,17 +50,21 @@ namespace Entities
 
             _energy = MaxEnergy;
 
-            Debug.Log("Spawn");
+            AdultScale = Vector3.one;
+            YoungScale = 0.5f * AdultScale;
 
-            DefaultScale = transform.localScale;
-            Debug.Log(DefaultScale);
-
-            if (IsAdult())
-                StartReproductiveUrge();
+            GroundYPos = 0.5f; // HARDCODED
 
             AnimalSpawner = GetComponent<AnimalFactory>();
             AnimalSpawner.SetInstance(gameObject);
         }
+
+        private void Start()
+        {
+            if (IsAdult())
+                StartReproductiveUrge();
+        }
+
 
         private void InitializeFSM()
         {
@@ -158,12 +160,6 @@ namespace Entities
         }
 
 
-        public void AnimalIsNotAdult()
-        {
-            _reproductiveUrge = null;
-        }
-
-
 
 
         //  -----  GET TRAITS  -----  
@@ -208,21 +204,19 @@ namespace Entities
 
         public virtual void AnimalIsYoung()
         {
-            Debug.Log("AnimalIsYoung");
-            Debug.Log(DefaultScale);
-            transform.localScale = DefaultScale * 0.5f;
-            DefaultScale = transform.localScale;
-            Debug.Log(DefaultScale);
-
-            transform.position += Vector3.up * (0.5f * DefaultScale.y - transform.position.y);
-            moveSpeed *= 0.5f;
             _reproductiveUrge = null;
+
+            transform.localScale = YoungScale;
+            transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
+
+            moveSpeed *= 0.5f;
             StartCoroutine(GrowIntoAdult());
         }
 
         private IEnumerator GrowIntoAdult()
         {
             float adultTime = UnityEngine.Random.Range(35, 45);
+            _reproductiveUrge = null;
             yield return new WaitForSeconds(adultTime);
             AnimalIsAdult();
         }
@@ -231,11 +225,11 @@ namespace Entities
         {
             if (!IsAdult())
             {
-                transform.localScale = DefaultScale * 2f;
-                DefaultScale = transform.localScale;
-                transform.position += Vector3.up * (0.5f * DefaultScale.y - transform.position.y);
+                transform.localScale = AdultScale;
+                transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
                 moveSpeed *= 2f;
             }
+            OnAnimalGrowToAdult?.Invoke();
             StartReproductiveUrge();
         }
 
@@ -244,8 +238,22 @@ namespace Entities
             for (int i = 0; i < UnityEngine.Random.Range(1,4); i++)
             {
                 Animal newAnimal = AnimalSpawner.GetNewInstance().GetComponent<Animal>();
+
+                newAnimal.SetTraits(moveSpeed, senseRadius);
                 newAnimal.AnimalIsYoung();
+                newAnimal.transform.position += Vector3.forward * UnityEngine.Random.Range(-1f, 1f) +
+                                                Vector3.right * UnityEngine.Random.Range(-1f, 1f);
+                newAnimal.transform.SetParent(transform.parent);
+                newAnimal.gameObject.name = "Rabbit (born)";
             }
+        }
+
+        public virtual void SetTraits(float ms, float sr)
+        {
+            float _moveSpeedVar = 1f;
+            float _senseRadiusVar = 3f;
+            moveSpeed = ms + UnityEngine.Random.Range(-_moveSpeedVar, _moveSpeedVar);
+            senseRadius = sr + UnityEngine.Random.Range(-_senseRadiusVar, _senseRadiusVar);
         }
 
 
