@@ -2257,3 +2257,6 @@ MonoBehaviour:
   _animalPanel: {fileID: 7372815972735694637}
   _panelImage: {fileID: 7372815972051454532}
   _stateText: {fileID: 7819402894802078285}
+  _reproductiveUrgeImage: {fileID: 2274042626001248176}
+  _repUrgeOn: {fileID: 21300000, guid: bcf5d54b18ae27a4a86a9db7998270bf, type: 3}
+  _repUrgeOff: {fileID: 21300000, guid: 919f7b2cce5ccd842a3f01dfd374a5ec, type: 3}
