@@ -21,7 +21,6 @@ public class Exploring : State
     private Type _diet;
 
     private float _energyLost;
-    private float _hungerThreshold = 50f;
 
     public Exploring(Animal animal) : base(animal.gameObject)
     {
@@ -40,7 +39,7 @@ public class Exploring : State
     {
         _animal.ModifyEnergy(-_energyLost);
 
-        if (IsHungry())
+        if (_animal.IsHungry())
         {
             var foodTarget = NearbyFood();
             if (foodTarget != null)
@@ -116,10 +115,6 @@ public class Exploring : State
         return null;
     }
 
-    private bool IsHungry()
-    {
-        return _animal.GetEnergy() < _hungerThreshold;
-    }
 
     private LivingBeing NearbyFood()
     {

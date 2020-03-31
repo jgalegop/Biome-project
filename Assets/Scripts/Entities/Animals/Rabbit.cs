@@ -2,7 +2,7 @@
 using System;
 using Random = UnityEngine.Random;
 
-namespace Entities.Animals
+namespace Entities
 {
     public class Rabbit : Animal
     {

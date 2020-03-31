@@ -15,10 +15,13 @@ namespace Entities
     public abstract class Animal : LivingBeing
     {
         protected float moveSpeed;
+        private float _adultMoveSpeed;
         protected float senseRadius;
         protected Type diet;
 
         private float _energy;
+        private float _hungerThreshold = 50;
+
         private bool? _reproductiveUrge = false;
         private float _repUrgeTime = 30f;
         private float _repUrgeTimeVar = 15f;
@@ -50,6 +53,8 @@ namespace Entities
 
             _energy = MaxEnergy;
 
+            _adultMoveSpeed = moveSpeed;
+
             AdultScale = Vector3.one;
             YoungScale = 0.5f * AdultScale;
 
@@ -57,6 +62,8 @@ namespace Entities
 
             AnimalSpawner = GetComponent<AnimalFactory>();
             AnimalSpawner.SetInstance(gameObject);
+
+            StatisticsManager.AnimalIsBorn(this);
         }
 
         private void Start()
@@ -83,6 +90,7 @@ namespace Entities
         public override void Die()
         {
             OnAnimalDeath?.Invoke();
+            StatisticsManager.AnimalHasDied(this);
             base.Die();
         }
 
@@ -117,6 +125,12 @@ namespace Entities
         {
             return _energy;
         }
+
+        public bool IsHungry()
+        {
+            return _energy < _hungerThreshold;
+        }
+
 
         //  -----  REPRODUCTIVE URGE  -----
         public bool GetReproductiveUrge()
@@ -165,11 +179,15 @@ namespace Entities
         //  -----  GET TRAITS  -----  
         public float GetMoveSpeed() { return moveSpeed; }
 
+        public float GetAdultMoveSpeed() { return _adultMoveSpeed; }
+
         public float GetSenseRadius() { return senseRadius; }
 
         public Type GetDiet() { return diet; }
 
         public float GetEnergyLostPerTick() { return 0.5f * moveSpeed * moveSpeed; }
+
+        //public float GetEnergyLostPerTick() { return 4f; }
 
         
         public Type GetState()
@@ -209,7 +227,7 @@ namespace Entities
             transform.localScale = YoungScale;
             transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
 
-            moveSpeed *= 0.5f;
+            moveSpeed = 0.5f * _adultMoveSpeed;
             StartCoroutine(GrowIntoAdult());
         }
 
@@ -227,7 +245,7 @@ namespace Entities
             {
                 transform.localScale = AdultScale;
                 transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
-                moveSpeed *= 2f;
+                moveSpeed = _adultMoveSpeed;
             }
             OnAnimalGrowToAdult?.Invoke();
             StartReproductiveUrge();
@@ -239,7 +257,9 @@ namespace Entities
             {
                 Animal newAnimal = AnimalSpawner.GetNewInstance().GetComponent<Animal>();
 
-                newAnimal.SetTraits(moveSpeed, senseRadius);
+                newAnimal.SetTraits(moveSpeed, senseRadius); //overwrite awake SetTraits
+                _adultMoveSpeed = moveSpeed;
+
                 newAnimal.AnimalIsYoung();
                 newAnimal.transform.position += Vector3.forward * UnityEngine.Random.Range(-1f, 1f) +
                                                 Vector3.right * UnityEngine.Random.Range(-1f, 1f);
@@ -263,4 +283,3 @@ namespace Entities
         }
     }
 }
-
