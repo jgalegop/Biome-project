@@ -16,11 +16,7 @@ public class Exploring : State
     private float _turnSpeed = 3f;
     private float _rayDistance = 5f;
 
-    private float _senseRadius;
-
     private Type _diet;
-
-    private float _energyLost;
 
     public Exploring(Animal animal) : base(animal.gameObject)
     {
@@ -28,16 +24,14 @@ public class Exploring : State
 
         if (_animal != null)
         {
-            _senseRadius = _animal.GetSenseRadius();
             _diet = _animal.GetDiet();
-
-            _energyLost = _animal.GetEnergyLostPerTick();
         }
     }
 
     public override Type Tick()
     {
-        _animal.ModifyEnergy(-_energyLost);
+        _rayDistance = _animal.GetSenseRadius();
+        _animal.ModifyEnergy(-_animal.GetEnergyLostPerTick());
 
         if (_animal.IsHungry())
         {
@@ -118,7 +112,7 @@ public class Exploring : State
 
     private LivingBeing NearbyFood()
     {
-        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _senseRadius);
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _animal.GetSenseRadius());
 
         // filter all with type _diet
         Collider[] nearbyFoodColliders = 
@@ -128,7 +122,7 @@ public class Exploring : State
 
         // check which one's closer and target it
         LivingBeing closestFood = null;
-        float smallestDist = _senseRadius + 1;
+        float smallestDist = _animal.GetSenseRadius() + 1;
         foreach (LivingBeing lb in nearbyFood)
         {
             float dist = Vector3.Distance(transform.position, lb.transform.position);
@@ -154,7 +148,7 @@ public class Exploring : State
 
     private Animal NearbyMate()
     {
-        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _senseRadius);
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _animal.GetSenseRadius());
 
         // filter all with same animal specie type
         Collider[] nearbySpecieColliders =
@@ -164,7 +158,7 @@ public class Exploring : State
 
         // check which one's closer and target it
         Animal closestMate = null;
-        float smallestDist = _senseRadius + 1;
+        float smallestDist = _animal.GetSenseRadius() + 1;
         foreach (Animal a in potentialMates)
         {
             float dist = Vector3.Distance(transform.position, a.transform.position);

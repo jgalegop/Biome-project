@@ -110,7 +110,7 @@ public class DataStatistics : MonoBehaviour
                 return _moveSpeedPoints[i - 1];
             }
         }
-        Debug.Log("MoveSpeed outside of range");
+        Debug.Log("MoveSpeed " + moveSpeed + " outside of range");
         return 100;
     }
 

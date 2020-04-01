@@ -62,13 +62,12 @@ namespace Entities
 
             AnimalSpawner = GetComponent<AnimalFactory>();
             AnimalSpawner.SetInstance(gameObject);
-
-            StatisticsManager.AnimalIsBorn(this);
         }
 
 
         private void Start()
         {
+            StatisticsManager.AnimalIsBorn(this);
             if (IsAdult())
                 StartReproductiveUrge();
         }
@@ -186,9 +185,9 @@ namespace Entities
 
         public Type GetDiet() { return diet; }
 
-        public float GetEnergyLostPerTick() { return 0.5f * moveSpeed * moveSpeed; }
+        public float GetEnergyLostPerTick() { return 2 + 0.2f * moveSpeed * moveSpeed; }
 
-        
+
         public Type GetState()
         {
             return FSM.CurrentState.GetType();
@@ -271,14 +270,27 @@ namespace Entities
         {
             float _moveSpeedVar = 1f;
             float _senseRadiusVar = 3f;
+
             moveSpeed = ms + UnityEngine.Random.Range(-_moveSpeedVar, _moveSpeedVar);
+            if (moveSpeed < 0)
+                moveSpeed = 0;
+            _adultMoveSpeed = moveSpeed;
+
             senseRadius = sr + UnityEngine.Random.Range(-_senseRadiusVar, _senseRadiusVar);
+            if (senseRadius < 0)
+                senseRadius = 0;
         }
 
 
         public void AnimalDebugToggle()
         {
             DebugModeOn = !DebugModeOn;
+        }
+
+        // debug
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(transform.position, senseRadius);
         }
     }
 }

@@ -15,7 +15,7 @@ public class PlotCanvas : MonoBehaviour
     private float _barWidth;
 
     [SerializeField]
-    private float _barWidthFill = 0.9f;
+    private float _barWidthFill = 0.8f;
 
     [SerializeField]
     private Color _barColor = Color.white;
@@ -46,15 +46,6 @@ public class PlotCanvas : MonoBehaviour
 
         // PERHAPS THIS SHOULD BE SOMEWHERE ELSE
         DOTween.SetTweensCapacity(500, 50);
-    }
-
-
-    private void Update()
-    {
-        foreach (GameObject bar in _bars)
-        {
-            bar.GetComponent<Image>().color = _barColor;
-        }
     }
 
     private GameObject GetBar(int xVal, int yVal)
@@ -105,7 +96,7 @@ public class PlotCanvas : MonoBehaviour
         }
 
         _data = _dataStats.GetData();
-        _maxYData = 10;
+        _maxYData = 12;
         _barWidth = (_plotWidth / _data.Count + 1) * _barWidthFill;
 
         int i = 0;

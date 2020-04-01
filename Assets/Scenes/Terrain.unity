@@ -1928,7 +1928,7 @@ PrefabInstance:
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 20.3849
+      value: 47.8
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
@@ -1938,22 +1938,22 @@ PrefabInstance:
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.10802954
+      value: 0.21155953
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalRotation.y
-      value: 0.42119837
+      value: 0.41245532
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.05017441
+      value: -0.09868863
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.899113
+      value: 0.8805588
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
@@ -1963,17 +1963,17 @@ PrefabInstance:
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
-      value: 20
+      value: 27
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 45
+      value: 50.208004
       objectReference: {fileID: 0}
     - target: {fileID: 6050143095887638174, guid: 92d4b99c34c7eb145bd108ef47634801,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
+      value: 0.046000004
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 92d4b99c34c7eb145bd108ef47634801, type: 3}
@@ -5812,9 +5812,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5821b2c09f08294a83588f1d126e1fb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  NumberOfBars: 15
+  NumberOfBars: 20
   _minMoveSpeed: 1
-  _maxMoveSpeed: 5
+  _maxMoveSpeed: 10
   _animalList: []
   _moveSpeedsList: []
   _moveSpeedPoints: []

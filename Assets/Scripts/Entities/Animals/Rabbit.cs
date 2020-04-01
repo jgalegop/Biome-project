@@ -55,13 +55,6 @@ namespace Entities
             _rabbitMovement.SetDefaultScale(AdultScale);
             _rabbitMovement.SetMoveParams();
         }
-
-
-        // debug
-        private void OnDrawGizmos()
-        {
-            Gizmos.DrawWireSphere(transform.position, _senseRadius);
-        }
     }
 }
 
