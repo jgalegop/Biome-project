@@ -6,8 +6,7 @@ using System.Linq;
 
 public class DataStatistics : MonoBehaviour
 {
-    [SerializeField]
-    private int _numberOfBars = 15;
+    public int NumberOfBars = 15;
 
     [SerializeField]
     private float _minMoveSpeed = 1f;
@@ -35,8 +34,8 @@ public class DataStatistics : MonoBehaviour
     {
         _plotCanvas = GetComponent<PlotCanvas>();
 
-        _moveSpeedPoints = new float[_numberOfBars];
-        _debugAnimalNumbers = new int[_numberOfBars];
+        _moveSpeedPoints = new float[NumberOfBars];
+        _debugAnimalNumbers = new int[NumberOfBars];
         SetMoveSpeedPoints();
         SetAnimalNumberDictionary();
 
@@ -53,7 +52,7 @@ public class DataStatistics : MonoBehaviour
         float msPoint = GetClosestMoveSpeedPoint(ms);
         _animalNumberWithMoveSpeed[msPoint]++;
 
-        for (int i = 0; i < _numberOfBars; i++)
+        for (int i = 0; i < NumberOfBars; i++)
         {
             _debugAnimalNumbers[i] = _animalNumberWithMoveSpeed[_moveSpeedPoints[i]];
         }
@@ -70,7 +69,7 @@ public class DataStatistics : MonoBehaviour
         float msPoint = GetClosestMoveSpeedPoint(ms);
         _animalNumberWithMoveSpeed[msPoint]--;
 
-        for (int i = 0; i < _numberOfBars; i++)
+        for (int i = 0; i < NumberOfBars; i++)
         {
             _debugAnimalNumbers[i] = _animalNumberWithMoveSpeed[_moveSpeedPoints[i]];
         }
@@ -89,9 +88,9 @@ public class DataStatistics : MonoBehaviour
 
     private void SetMoveSpeedPoints()
     {
-        for (int i = 0; i < _numberOfBars; i++)
+        for (int i = 0; i < NumberOfBars; i++)
         {
-            _moveSpeedPoints[i] = _minMoveSpeed + i * (_maxMoveSpeed - _minMoveSpeed) / _numberOfBars;
+            _moveSpeedPoints[i] = _minMoveSpeed + i * (_maxMoveSpeed - _minMoveSpeed) / NumberOfBars;
         }
     }
 

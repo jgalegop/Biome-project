@@ -66,6 +66,7 @@ namespace Entities
             StatisticsManager.AnimalIsBorn(this);
         }
 
+
         private void Start()
         {
             if (IsAdult())
@@ -186,8 +187,6 @@ namespace Entities
         public Type GetDiet() { return diet; }
 
         public float GetEnergyLostPerTick() { return 0.5f * moveSpeed * moveSpeed; }
-
-        //public float GetEnergyLostPerTick() { return 4f; }
 
         
         public Type GetState()
