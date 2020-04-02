@@ -21,7 +21,7 @@ public class ClickSelectController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetMouseButtonDown(1))
         {
             var ray = _camera.ScreenPointToRay(Input.mousePosition);
             Debug.DrawRay(ray.origin, ray.direction * 1000f, Color.red, 1f); 
