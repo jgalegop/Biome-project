@@ -23,10 +23,18 @@ public class CameraMovement : MonoBehaviour
     private Vector3 _minZoom = new Vector3(0, 15, -15);
     [SerializeField]
     private Vector3 _maxZoom = new Vector3(0, 600, -600);
+    [SerializeField]
+    private float _minViewAngle = -45f;
+    [SerializeField]
+    private float _maxViewAngle = 45f;
+
+    [SerializeField]
+    private PathfindGrid _grid = null;
 
 
     private Vector3 _newPosition;
     private Quaternion _newRotation;
+    private Quaternion _newCameraRotation;
     private Vector3 _newZoom;
 
     private Camera _camera;
@@ -65,6 +73,7 @@ public class CameraMovement : MonoBehaviour
     {
         _newPosition = transform.position;
         _newRotation = transform.rotation;
+        _newCameraRotation = _cameraTransform.localRotation;
         _newZoom = _cameraTransform.localPosition;
 
         _camera = _cameraTransform.GetComponent<Camera>();
@@ -132,8 +141,25 @@ public class CameraMovement : MonoBehaviour
                 _dragCurrentPosition = ray.GetPoint(entry);
 
                 _newPosition = transform.position + _dragStartPosition - _dragCurrentPosition;
+
+                ClampNewPosition();
             }
         }
+    }
+
+    private void ClampNewPosition()
+    {
+        if (_newPosition.x > 0.5f * _grid.GridWorldSize.x)
+            _newPosition += Vector3.right * (0.5f * _grid.GridWorldSize.x - _newPosition.x);
+
+        if (_newPosition.x < -0.5f * _grid.GridWorldSize.x)
+            _newPosition += Vector3.right * (-0.5f * _grid.GridWorldSize.x - _newPosition.x);
+
+        if (_newPosition.z > 0.5f * _grid.GridWorldSize.y)
+            _newPosition += Vector3.forward * (0.5f * _grid.GridWorldSize.y - _newPosition.z);
+
+        if (_newPosition.z < -0.5f * _grid.GridWorldSize.y)
+            _newPosition += Vector3.forward * (-0.5f * _grid.GridWorldSize.y - _newPosition.z);
     }
 
     private void MouseDragRotation()
@@ -150,10 +176,27 @@ public class CameraMovement : MonoBehaviour
             Vector3 difference = _rotateStartPosition - _rotateCurrentPosition;
             _rotateStartPosition = _rotateCurrentPosition;
 
-            _newRotation *= Quaternion.Euler(Vector3.up * (-difference.x / _rotationMouseAmount));
+            // order of rotations is important here (global vs local rotations)
+            // so we don't use *= operator here
+            if (Math.Abs(difference.x) >= Math.Abs(difference.y))
+                _newRotation = Quaternion.Euler(Vector3.up * (-difference.x / _rotationMouseAmount)) * _newRotation;
+            
+            if (Math.Abs(difference.y) > Math.Abs(difference.x))
+            {
+                ClampNewVerticalRotation(difference);
+            }
         }
     }
 
+    private void ClampNewVerticalRotation(Vector3 difference)
+    {
+        Quaternion addedRotation = Quaternion.Euler(Vector3.right * (-difference.y / _rotationMouseAmount));
+        Quaternion nextRot = _newRotation * addedRotation;
+
+        float xAngleCorrected = (nextRot.eulerAngles.x > 180) ? nextRot.eulerAngles.x - 360 : nextRot.eulerAngles.x;
+        if (xAngleCorrected > _minViewAngle && xAngleCorrected < _maxViewAngle)
+            _newRotation *= addedRotation;
+    }
 
     private void HandleKeyboardInput()
     {
@@ -218,8 +261,26 @@ public class CameraMovement : MonoBehaviour
 
         transform.position = Vector3.Lerp(transform.position, _newPosition, Time.deltaTime * _movementTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, _newRotation, Time.deltaTime * _movementTime);
+        //transform.rotation = ClampedRotation();
 
         _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, _newZoom, Time.deltaTime * _movementTime);
+    }
+
+
+    // unused??
+    private Quaternion ClampedRotation(Quaternion rotation)
+    {
+        //Debug.Log(rotation.eulerAngles.x);
+        float xAngleCorrected = (rotation.eulerAngles.x > 180) ? rotation.eulerAngles.x - 360 : rotation.eulerAngles.x;
+        //Debug.Log(xAngleCorrected);
+        float xAngle = Mathf.Clamp(xAngleCorrected, -45f, 45f);
+        //Debug.Log(xAngle);
+        Quaternion newRot = rotation;
+        //Debug.Log(newRot.eulerAngles);
+        newRot.eulerAngles += Vector3.right * (xAngle - newRot.eulerAngles.x);
+        //Debug.Log(newRot.eulerAngles);
+        //Debug.Log("--------");
+        return newRot;
     }
 
     private void CheckIfFocusAnimal()
