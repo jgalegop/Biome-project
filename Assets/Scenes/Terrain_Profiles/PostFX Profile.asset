@@ -52,10 +52,10 @@ MonoBehaviour:
     overrideState: 0
     value: 1
   temperature:
-    overrideState: 1
+    overrideState: 0
     value: 3
   tint:
-    overrideState: 1
+    overrideState: 0
     value: -5
   colorFilter:
     overrideState: 0
@@ -71,7 +71,7 @@ MonoBehaviour:
     value: 0
   postExposure:
     overrideState: 1
-    value: 0.04
+    value: 0.29
   contrast:
     overrideState: 1
     value: 9
@@ -1441,7 +1441,7 @@ MonoBehaviour:
     overrideState: 1
     value: 1
   focusDistance:
-    overrideState: 1
+    overrideState: 0
     value: 3.61
   aperture:
     overrideState: 0

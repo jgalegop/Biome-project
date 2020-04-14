@@ -22,6 +22,14 @@ public class PathfindGrid : MonoBehaviour
         transform.position = Vector3.zero;
 
         _nodeDiameter = 2 * _nodeRadius;
+
+        GameObject terrain = GameObject.Find("TerrainMesh");
+        if (terrain == null)
+            Debug.LogError("We need a terrain mesh first. Make sure that you have it in-game, or that this script is not called in awake");
+
+        Vector3 terrainSize = terrain.GetComponent<MeshFilter>().sharedMesh.bounds.size;
+        GridWorldSize = new Vector2(terrainSize.x, terrainSize.z);
+
         _gridSizeX = Mathf.RoundToInt(GridWorldSize.x / _nodeDiameter);
         _gridSizeY = Mathf.RoundToInt(GridWorldSize.y / _nodeDiameter);
         CreateGrid();

@@ -17,6 +17,16 @@ public class AnimalSpawner : MonoBehaviour
 
     private void Awake()
     {
+        Init();
+    }
+
+    private void OnEnable()
+    {
+        Init();   
+    }
+
+    private void Init()
+    {
         if (_animalPrefabsList.Length != _initialNumberOfAnimals.Length)
             Debug.LogError("Lists must be the same size");
 
