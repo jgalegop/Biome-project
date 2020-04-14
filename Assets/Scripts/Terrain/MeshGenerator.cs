@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrainMesh(float[,] heightMap, float waterThreshold, float yPos)
+    public static MeshData GenerateTerrainMesh(float[,] heightMap, float waterThreshold, float yPos, float waterDepth)
     {
         int tilesWidth = heightMap.GetLength(0);
         int tilesHeight = heightMap.GetLength(1);
@@ -12,7 +12,6 @@ public static class MeshGenerator
         float topLeftZ = 0.5f * tilesHeight;
 
         float defaultHeight = 1f;
-        float waterDepth = 0.2f;
 
         // convenience
         Vector2Int[] nswe = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };

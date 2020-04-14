@@ -9,6 +9,8 @@ public class MapGenerator : MonoBehaviour
     private int _mapHeight = 2;
     [SerializeField]
     private float _yPosition = -0.5f;
+    [SerializeField]
+    private float _waterDepth = 0.3f;
 
     [SerializeField]
     private int _seed = 0;
@@ -49,7 +51,7 @@ public class MapGenerator : MonoBehaviour
         Color[] colormap = SetColorMap(noiseMap);
 
         // Display
-        var meshData = MeshGenerator.GenerateTerrainMesh(noiseMap, _regions[0].height, _yPosition);
+        var meshData = MeshGenerator.GenerateTerrainMesh(noiseMap, _regions[0].height, _yPosition, _waterDepth);
         _mapDisplay.DrawMesh(meshData, TextureGenerator.TextureFromColormap(colormap, _mapWidth, _mapHeight));
         if (_generateObstacles)
             ObstacleGenerator.GenerateObstacleMesh(meshData);
