@@ -22,6 +22,16 @@ public class PlantSpawner : MonoBehaviour
 
     private void Start()
     {
+        Init();
+    }
+
+    private void OnEnable()
+    {
+        Init();
+    }
+
+    private void Init()
+    {
         _grid = FindObjectOfType<PathfindGrid>();
         if (_grid == null)
             Debug.LogError("Scene needs a PathfindGrid object");

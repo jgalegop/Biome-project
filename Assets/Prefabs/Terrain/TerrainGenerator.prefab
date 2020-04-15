@@ -47,7 +47,7 @@ MonoBehaviour:
   _mapWidth: 64
   _mapHeight: 64
   _yPosition: -0.5
-  _waterDepth: 0.3
+  _waterDepth: 0.35
   _seed: 1
   _offset: {x: 0, y: 0}
   _noiseScale: 43.9

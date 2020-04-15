@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 using Entities;
 using UnityEngine;
+using UnityEngine.Rendering.PostProcessing;
 
 public class CameraMovement : MonoBehaviour
 {
@@ -31,6 +30,9 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     private PathfindGrid _grid = null;
 
+    [SerializeField]
+    private PostProcessVolume _postFX = null;
+
 
     private Vector3 _newPosition;
     private Quaternion _newRotation;
@@ -48,11 +50,15 @@ public class CameraMovement : MonoBehaviour
     private Transform _boundAnimalTransform;
     private bool _animalIsFollowed;
 
+    private DepthOfField _depthOfField = null;
+
 
     private void Awake()
     {
         ClickSelectController.OnSelectedAnimalChanged += BindSelectedAnimal;
         BindSelectedAnimal(ClickSelectController.SelectedAnimal);
+
+        _postFX.profile.TryGetSettings(out _depthOfField);
     }
 
     private void OnDestroy()
@@ -109,6 +115,8 @@ public class CameraMovement : MonoBehaviour
 
             if (distToMax > distMinToMax)
                 _newZoom = _minZoom;
+
+
         }
     }
 
@@ -261,26 +269,10 @@ public class CameraMovement : MonoBehaviour
 
         transform.position = Vector3.Lerp(transform.position, _newPosition, Time.deltaTime * _movementTime);
         transform.rotation = Quaternion.Lerp(transform.rotation, _newRotation, Time.deltaTime * _movementTime);
-        //transform.rotation = ClampedRotation();
 
         _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, _newZoom, Time.deltaTime * _movementTime);
-    }
 
-
-    // unused??
-    private Quaternion ClampedRotation(Quaternion rotation)
-    {
-        //Debug.Log(rotation.eulerAngles.x);
-        float xAngleCorrected = (rotation.eulerAngles.x > 180) ? rotation.eulerAngles.x - 360 : rotation.eulerAngles.x;
-        //Debug.Log(xAngleCorrected);
-        float xAngle = Mathf.Clamp(xAngleCorrected, -45f, 45f);
-        //Debug.Log(xAngle);
-        Quaternion newRot = rotation;
-        //Debug.Log(newRot.eulerAngles);
-        newRot.eulerAngles += Vector3.right * (xAngle - newRot.eulerAngles.x);
-        //Debug.Log(newRot.eulerAngles);
-        //Debug.Log("--------");
-        return newRot;
+        //_depthOfField.focusDistance.value = Vector3.Distance(transform.position, _cameraTransform.position);
     }
 
     private void CheckIfFocusAnimal()
