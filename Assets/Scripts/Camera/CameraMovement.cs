@@ -116,7 +116,8 @@ public class CameraMovement : MonoBehaviour
             if (distToMax > distMinToMax)
                 _newZoom = _minZoom;
 
-
+            float normalizedZoom = Mathf.InverseLerp(0, distMinToMax, distToMin);
+            _depthOfField.focalLength.value = 80f * (1f - normalizedZoom);
         }
     }
 
@@ -272,7 +273,7 @@ public class CameraMovement : MonoBehaviour
 
         _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, _newZoom, Time.deltaTime * _movementTime);
 
-        //_depthOfField.focusDistance.value = Vector3.Distance(transform.position, _cameraTransform.position);
+        _depthOfField.focusDistance.value = Vector3.Distance(transform.position, _cameraTransform.position);
     }
 
     private void CheckIfFocusAnimal()
