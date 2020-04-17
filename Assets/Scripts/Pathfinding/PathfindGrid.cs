@@ -19,6 +19,11 @@ public class PathfindGrid : MonoBehaviour
 
     private void Awake()
     {
+        StartPathfindGrid();
+    }
+
+    public void StartPathfindGrid()
+    {
         transform.position = Vector3.zero;
 
         _nodeDiameter = 2 * _nodeRadius;
