@@ -190,7 +190,10 @@ namespace Entities
 
         public Type GetState()
         {
-            return FSM.CurrentState.GetType();
+            if (FSM.CurrentState == null)
+                return typeof(Exploring);
+            else
+                return FSM.CurrentState.GetType();
         }
 
         public string GetStateName() 
@@ -199,7 +202,6 @@ namespace Entities
                 return FSM.CurrentState.StateName;
             else
                 return FSM.CurrentState.ToString();
-
         }
         
         public string GetDietText()

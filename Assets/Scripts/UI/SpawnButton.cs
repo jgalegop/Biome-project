@@ -1,14 +1,11 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.UI;
+﻿using UnityEngine;
 
 public class SpawnButton : MonoBehaviour
 {
     [SerializeField]
-    private GameObject _spawnPrefab;
+    private GameObject _spawnPrefab = null;
     [SerializeField]
-    private GameObject _prefabParent;
+    private GameObject _prefabParent = null;
 
     private PathfindGrid _grid = null;
 
