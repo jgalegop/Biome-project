@@ -19,6 +19,12 @@ namespace Entities
         // movement
         private RabbitMovement _rabbitMovement;
 
+        // material
+        private Material _mat;
+
+        [SerializeField]
+        private Color[] _possibleColors = null;
+
 
         public override void Spawn()
         {
@@ -30,6 +36,22 @@ namespace Entities
             base.Spawn();
 
             _rabbitMovement = GetComponent<RabbitMovement>();
+
+            SetColor();
+        }
+
+        private void SetColor()
+        {
+            _mat = GetComponentInChildren<MeshRenderer>().material;
+            int i = Random.Range(0, _possibleColors.Length);
+
+            // special color
+            int j = Random.Range(0, 255);
+
+            if (j == 0)
+                _mat.color = new Color(222f / 255f, 150f / 255f, 171f / 255f); // new Color(222, 150, 171);
+            else
+                _mat.color = _possibleColors[i];
         }
 
 

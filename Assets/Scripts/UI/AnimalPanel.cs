@@ -81,6 +81,7 @@ public class AnimalPanel : MonoBehaviour
 
             _panelImage.transform.DOScale(Vector3.one, 0.4f)
                                  .SetEase(Ease.OutBack);
+            _animalGraphic.GetComponentInChildren<MeshRenderer>().material.color = _boundAnimal.GetComponentInChildren<MeshRenderer>().material.color;
         }
         else
         {
