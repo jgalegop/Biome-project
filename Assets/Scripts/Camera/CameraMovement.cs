@@ -117,7 +117,7 @@ public class CameraMovement : MonoBehaviour
                 _newZoom = _minZoom;
 
             float normalizedZoom = Mathf.InverseLerp(0, distMinToMax, distToMin);
-            _depthOfField.focalLength.value = 80f * (1f - normalizedZoom);
+            _depthOfField.focalLength.value = 70f * (1f - normalizedZoom);
         }
     }
 
