@@ -33,10 +33,12 @@ public class CameraMovement : MonoBehaviour
     [SerializeField]
     private PostProcessVolume _postFX = null;
 
+    [SerializeField]
+    private Transform _energyBar = null;
+
 
     private Vector3 _newPosition;
     private Quaternion _newRotation;
-    private Quaternion _newCameraRotation;
     private Vector3 _newZoom;
 
     private Camera _camera;
@@ -51,6 +53,10 @@ public class CameraMovement : MonoBehaviour
     private bool _animalIsFollowed;
 
     private DepthOfField _depthOfField = null;
+
+    private readonly float _minBarScale = 0.25f;
+    private readonly float _maxBarScale = 4f;
+    private float _energyBarScaleFactor = 1f;
 
 
     private void Awake()
@@ -79,7 +85,6 @@ public class CameraMovement : MonoBehaviour
     {
         _newPosition = transform.position;
         _newRotation = transform.rotation;
-        _newCameraRotation = _cameraTransform.localRotation;
         _newZoom = _cameraTransform.localPosition;
 
         _camera = _cameraTransform.GetComponent<Camera>();
@@ -118,6 +123,21 @@ public class CameraMovement : MonoBehaviour
 
             float normalizedZoom = Mathf.InverseLerp(0, distMinToMax, distToMin);
             _depthOfField.focalLength.value = 70f * (1f - normalizedZoom);
+
+            SetEnergyBarScale(normalizedZoom);
+        }
+    }
+
+    private void SetEnergyBarScale(float normalZoom)
+    {
+        float normalZoomThreshold = 0.15f;
+        if (normalZoom > normalZoomThreshold)
+        {
+            _energyBarScaleFactor = (1f - _minBarScale) / (1f - normalZoomThreshold) * (1f - normalZoom) + _minBarScale;
+        }
+        else
+        {
+            _energyBarScaleFactor = (_maxBarScale - 1f) / normalZoomThreshold * (normalZoomThreshold - normalZoom) + 1f;
         }
     }
 
@@ -274,6 +294,8 @@ public class CameraMovement : MonoBehaviour
         _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, _newZoom, Time.deltaTime * _movementTime);
 
         _depthOfField.focusDistance.value = Vector3.Distance(transform.position, _cameraTransform.position);
+
+        _energyBar.localScale = Vector3.Lerp(_energyBar.localScale, _energyBarScaleFactor * Vector3.one, Time.deltaTime * _movementTime);
     }
 
     private void CheckIfFocusAnimal()

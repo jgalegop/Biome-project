@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 
 namespace Entities
@@ -8,11 +6,8 @@ namespace Entities
     public class TreeObstacle : MonoBehaviour
     {
         [SerializeField]
-        private Transform _trunk = null;
-        [SerializeField]
         private Transform _crown = null;
 
-        private Vector3 _trunkDefaultScale;
         private Vector3 _crownDefaultScale;
 
         private void Awake()

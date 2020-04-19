@@ -1477,6 +1477,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!224 &1592363191 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2127308138194967978, guid: e3bb6e344729836448cdc2bbef86eda8,
+    type: 3}
+  m_PrefabInstance: {fileID: 4948981397118304443}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1596850892
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2313,6 +2319,11 @@ PrefabInstance:
       propertyPath: _postFX
       value: 
       objectReference: {fileID: 37597896}
+    - target: {fileID: 5566696540794497474, guid: 120339b8c3ce7c34fa01df81f2d2e7fd,
+        type: 3}
+      propertyPath: _energyBar
+      value: 
+      objectReference: {fileID: 1592363191}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 120339b8c3ce7c34fa01df81f2d2e7fd, type: 3}
 --- !u!1001 &5685440651322650325
