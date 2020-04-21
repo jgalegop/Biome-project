@@ -49,7 +49,7 @@ namespace Entities
             int j = Random.Range(0, 255);
 
             if (j == 0)
-                _mat.color = new Color(222f / 255f, 150f / 255f, 171f / 255f); // new Color(222, 150, 171);
+                _mat.color = new Color(227f / 255f, 138f / 255f, 167f / 255f); // new Color(222, 150, 171);
             else
                 _mat.color = _possibleColors[i];
         }

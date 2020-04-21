@@ -26,12 +26,15 @@ namespace Entities
         private float _repUrgeTime = 30f;
         private float _repUrgeTimeVar = 15f;
 
+        private float _forgetFoodTime = 5f;
+
         public Vector3 AdultScale { get; private set; }
         public Vector3 YoungScale { get; private set; }
 
         public float MaxEnergy { get; protected set; }
 
         public LivingBeing TargetFood { get; private set; }
+        public LivingBeing FoodIgnored { get; private set; }
         public Animal TargetMate { get; private set; }
 
         public event Action OnAnimalDeath = delegate { };
@@ -43,6 +46,20 @@ namespace Entities
         public bool DebugModeOn { get; private set; }
 
         public FiniteStateMachine FSM { get; private set; }
+
+        /*
+        private Vector3 _prevPos;
+        private Quaternion _prevRot;
+        private Vector3 _prevSca;
+        private int _count = 0;
+        private int _maxCount = 100;
+        private bool debuggedFroze = false;
+        */
+
+        private bool _foodCoroutineRunning = false;
+        private Coroutine _foodIgnoreCoroutine = null;
+
+        public int UnsucsesfulPathfinds = 0;
 
 
         public override void Spawn()
@@ -62,6 +79,8 @@ namespace Entities
 
             AnimalSpawner = GetComponent<AnimalFactory>();
             AnimalSpawner.SetInstance(gameObject);
+
+            FoodIgnored = null;
         }
 
 
@@ -91,6 +110,7 @@ namespace Entities
         {
             OnAnimalDeath?.Invoke();
             StatisticsManager.AnimalHasDied(this);
+            StopAllCoroutines();
             base.Die();
         }
 
@@ -282,6 +302,57 @@ namespace Entities
             if (senseRadius < 0)
                 senseRadius = 0;
         }
+
+        public void SetFoodIgnored(LivingBeing lb)
+        {
+            FoodIgnored = lb;
+            if (lb != null && this != null && StopIgnoringFood() != null)
+            {
+                if (_foodIgnoreCoroutine != null && _foodCoroutineRunning)
+                    StopCoroutine(_foodIgnoreCoroutine);
+                _foodIgnoreCoroutine = StartCoroutine(StopIgnoringFood());
+            }
+        }
+
+        private IEnumerator StopIgnoringFood()
+        {
+            _foodCoroutineRunning = true;
+            yield return new WaitForSeconds(_forgetFoodTime);
+            FoodIgnored = null;
+            _foodCoroutineRunning = false;
+            _foodIgnoreCoroutine = null;
+        }
+
+        public void DebugChangeColor()
+        {
+            //gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.blue;
+        }
+
+
+        /*
+        private void Update()
+        {
+            if (transform.position == _prevPos &&
+                transform.rotation == _prevRot && 
+                transform.localScale == _prevSca)
+            {
+                _count++;
+                if (_count > _maxCount && !debuggedFroze)
+                {
+                    DebugChangeColor();
+                    Debug.LogError("rabbit stayed frozen for too long, in state " + FSM.CurrentState + " and " + UnsucsesfulPathfinds + " pathfinding fails");
+                    debuggedFroze = true;
+                }
+            }
+            else
+            {
+                _count = 0;
+            }
+            _prevPos = transform.position;
+            _prevRot = transform.rotation;
+            _prevSca = transform.localScale;
+        }
+        */
 
 
         public void AnimalDebugToggle()

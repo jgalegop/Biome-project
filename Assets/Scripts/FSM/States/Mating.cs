@@ -40,12 +40,10 @@ public class Mating : State
             _animal.StopReproductiveUrge();
             if (!_animal.TargetMate.GetReproductiveUrge())
             {
-                _numberOfJumps = 0;
-
                 _animal.SpawnOffspring();
-
-                return typeof(Exploring);
             }
+            _numberOfJumps = 0;
+            return typeof(Exploring);
         }
 
         DanceTick();

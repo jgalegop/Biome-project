@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 namespace Entities
 {
@@ -32,4 +33,3 @@ namespace Entities
         public virtual void BeingEaten() { } 
     }
 }
-

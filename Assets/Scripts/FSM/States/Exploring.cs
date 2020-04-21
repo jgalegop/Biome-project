@@ -59,7 +59,6 @@ public class Exploring : State
                 if (mateTarget.GetReproductiveUrge() &&
                     mateTarget.GetState() == typeof(Exploring) || mateTarget.GetState() == typeof(GoingForMate))
                 {
-                    //Debug.Log(gameObject.name + " going for mate " + mateTarget.gameObject.name);
                     _animal.SetTargetMate(mateTarget);
                     _destination = null;
                     return typeof(GoingForMate);
@@ -100,13 +99,34 @@ public class Exploring : State
 
         Debug.DrawRay(transform.position, _destination.Value - transform.position, Color.red);
 
-        while (IsPathBlocked())
+        int k = 0;
+        while (IsPathBlocked() && k < 300)
         {
-            // I BELIEVE WHEN BORN THEY COULD GET STUCK HERE
-            FindRandomDestination();
+            k++;
+            if (k > 100)
+            {
+                // if stuck for too long
+                Debug.Log("try to look backwards - " + transform.position);
+                LookBackwards();
+            }
+            else
+            {
+                FindRandomDestination();
+            }
+
+            if (k > 280)
+                Debug.LogError("too long here!! " + transform.position);
         }
 
         return null;
+    }
+
+    private void LookBackwards()
+    {
+        _destination = transform.position - 2f * transform.forward;
+        UpdateDirection();
+        transform.rotation = Quaternion.Lerp(transform.rotation, _desiredRotation, 0.8f);
+        Debug.DrawRay(transform.position, _destination.Value - transform.position, Color.blue);
     }
 
 
@@ -126,11 +146,21 @@ public class Exploring : State
         foreach (LivingBeing lb in nearbyFood)
         {
             float dist = Vector3.Distance(transform.position, lb.transform.position);
-            if (dist < smallestDist &&
-                dist > Mathf.Epsilon)
+            if (dist < smallestDist && dist > Mathf.Epsilon)
             {
-                closestFood = lb;
-                smallestDist = dist;
+                if (_animal.FoodIgnored != null)
+                {
+                    if (_animal.FoodIgnored != lb)
+                    {
+                        closestFood = lb;
+                        smallestDist = dist;
+                    }
+                }
+                else
+                {
+                    closestFood = lb;
+                    smallestDist = dist;
+                }
             }
         }
 
@@ -197,12 +227,14 @@ public class Exploring : State
     private bool IsForwardBlocked()
     {
         Ray ray = new Ray(transform.position, transform.forward);
-        return Physics.SphereCast(ray, 0.5f, _rayDistance, _obstacleLayerMask);
+        float dist = Vector3.Distance(_destination.Value, transform.position);
+        return Physics.SphereCast(ray, 0.5f, dist, _obstacleLayerMask);
     }
 
     private bool IsPathBlocked()
     {
         Ray ray = new Ray(transform.position, _direction);
-        return Physics.SphereCast(ray, 0.5f, _rayDistance, _obstacleLayerMask);
+        float dist = Vector3.Distance(_destination.Value, transform.position);
+        return Physics.SphereCast(ray, 0.5f, dist, _obstacleLayerMask);
     }
 }

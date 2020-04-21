@@ -19,6 +19,8 @@ public class ChasingFood : State
     private int _targetIndex = 0;
     private Vector3 _vectorToTarget;
 
+    private int pathFailures = 0;
+
     private readonly LayerMask _obstacleLayerMask = LayerMask.GetMask("Obstacle");
 
     private PathfindingDebug _debug;
@@ -36,7 +38,7 @@ public class ChasingFood : State
     {
         _animal.ModifyEnergy(-_energyLost);
 
-        if (_animal.TargetFood == null)
+        if (_animal.TargetFood == null || _animal.TargetFood == _animal.FoodIgnored)
         {
             _pathToTargetFood = new Vector3[0];
             return typeof(Exploring);
@@ -65,14 +67,24 @@ public class ChasingFood : State
             if (waypointDist < interactionDistance)
             {
                 _targetIndex++;
-                if (_targetIndex >= _pathToTargetFood.Length)
+                if (_targetIndex >= _pathToTargetFood.Length && _pathToTargetFood.Length > 0)
                 {
                     // repeats and resets path
                     _targetIndex = 0;
                     _pathToTargetFood = new Vector3[0];
                     return null;
                 }
-                _currentWaypoint = _pathToTargetFood[_targetIndex];
+
+                if (_pathToTargetFood.Length == 0)
+                {
+                    _currentWaypoint = _animal.TargetFood.transform.position;
+                    // waypoint correction to y-pos
+                    _currentWaypoint += Vector3.up * (1f - _currentWaypoint.y); // ANIMAL PLANE
+                }
+                else
+                {
+                    _currentWaypoint = _pathToTargetFood[_targetIndex];
+                }
             }
 
             if (_debug.DebugPathfind)
@@ -105,12 +117,30 @@ public class ChasingFood : State
         {
             _pathToTargetFood = newPath;
             _currentWaypoint = _pathToTargetFood[0];
+            pathFailures = 0;
+            _animal.UnsucsesfulPathfinds = 0;
+        }
+        else
+        {
+            pathFailures++;
+            _animal.UnsucsesfulPathfinds++;
+            // if we have too many path failures, then we should ignore that target food, and keep exploring
+            if (pathFailures > 50)
+            {
+                _animal.SetFoodIgnored(_animal.TargetFood);
+                _animal.SetTargetFood(null);
+
+                //_animal.DebugChangeColor();
+                //Debug.LogError("food ignored");
+            }   
         }
     }
 
     private bool IsPathBlocked(Vector3 dir, float dist)
     {
         Ray ray = new Ray(transform.position, dir);
+        Debug.DrawRay(transform.position, _animal.TargetFood.transform.position - transform.position, Color.blue);
+        Debug.DrawRay(transform.position, _currentWaypoint - transform.position, Color.magenta);
         return Physics.SphereCast(ray, 0.5f, dist, _obstacleLayerMask);
     }
 
@@ -135,8 +165,6 @@ public class ChasingFood : State
         else
             transform.rotation = Quaternion.Lerp(transform.rotation, _targetFoodRotation, _turnSpeed * Time.deltaTime);
     }
-
-
 
     private void DebugDrawPathLines(Vector3 vectorToTarget)
     {

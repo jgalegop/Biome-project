@@ -21,20 +21,25 @@ public class SpawnButton : MonoBehaviour
 
     public void SpawnPrefab()
     {
-        if (SuitablePositionFound())
+        int k = 0;
+        while (k < 10)
         {
-            GameObject go = Instantiate(_spawnPrefab, _newWorldPos, Quaternion.identity);
-            go.transform.SetParent(_prefabParent.transform);
-
-            if (go.layer == LayerMask.NameToLayer("Obstacle"))
+            if (SuitablePositionFound())
             {
-                _grid.StartPathfindGrid();
+                GameObject go = Instantiate(_spawnPrefab, _newWorldPos, Quaternion.identity);
+                go.transform.SetParent(_prefabParent.transform);
+                k++;
+                if (go.layer == LayerMask.NameToLayer("Obstacle"))
+                {
+                    _grid.StartPathfindGrid();
+                }
+            }
+            else
+            {
+                Debug.Log("No suitable position found!");
             }
         }
-        else
-        {
-            Debug.Log("No suitable position found!");
-        }
+        
     }
 
     public void ChangeSizeOnEnter()
