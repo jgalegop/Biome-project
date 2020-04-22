@@ -1,11 +1,14 @@
 ﻿using UnityEngine;
 
-public class SpawnButton : MonoBehaviour
+public class SpawnButton : Button
 {
     [SerializeField]
     private GameObject _spawnPrefab = null;
     [SerializeField]
     private GameObject _prefabParent = null;
+
+    [SerializeField]
+    private SpawnNumberController _spawnNumberController = null;
 
     private PathfindGrid _grid = null;
 
@@ -22,7 +25,7 @@ public class SpawnButton : MonoBehaviour
     public void SpawnPrefab()
     {
         int k = 0;
-        while (k < 10)
+        while (k < _spawnNumberController.SpawnNumber)
         {
             if (SuitablePositionFound())
             {
@@ -40,16 +43,6 @@ public class SpawnButton : MonoBehaviour
             }
         }
         
-    }
-
-    public void ChangeSizeOnEnter()
-    {
-        transform.localScale *= 1.1f;
-    }
-
-    public void ChangeSizeOnExit()
-    {
-        transform.localScale *= 1/1.1f;
     }
 
     private bool SuitablePositionFound()
