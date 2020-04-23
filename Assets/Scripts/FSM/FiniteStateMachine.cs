@@ -8,6 +8,8 @@ public class FiniteStateMachine : MonoBehaviour
     private Dictionary<Type, State> _availableStates;
 
     public State CurrentState { get; private set; }
+    public State PreviousState { get; private set; }
+
     public event Action<State> OnStateChanged;
 
     // Set the states of the FSM
@@ -30,6 +32,7 @@ public class FiniteStateMachine : MonoBehaviour
         }
 
         var nextState = CurrentState.Tick();
+        PreviousState = CurrentState;
 
         if (nextState != null &&
             nextState != CurrentState.GetType())
@@ -40,6 +43,7 @@ public class FiniteStateMachine : MonoBehaviour
 
     private void SwitchToNewState(Type nextState)
     {
+        PreviousState = CurrentState;
         CurrentState = _availableStates[nextState];
         if (OnStateChanged != null)
         {

@@ -10,11 +10,10 @@ public class SpawnNumberButton : Button
     [SerializeField]
     private bool _isPressed = false;
     [SerializeField]
-    private Color _pressedColor;
+    private Color _pressedColor = Color.white;
 
     private Image _image;
     private Color _defaultColor;
-
 
     private void Start()
     {

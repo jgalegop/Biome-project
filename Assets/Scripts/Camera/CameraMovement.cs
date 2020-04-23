@@ -288,14 +288,14 @@ public class CameraMovement : MonoBehaviour
         if (_boundAnimalTransform != null && _animalIsFollowed)
             _newPosition = _boundAnimalTransform.position;
 
-        transform.position = Vector3.Lerp(transform.position, _newPosition, Time.deltaTime * _movementTime);
-        transform.rotation = Quaternion.Lerp(transform.rotation, _newRotation, Time.deltaTime * _movementTime);
+        transform.position = Vector3.Lerp(transform.position, _newPosition, Time.unscaledDeltaTime * _movementTime);
+        transform.rotation = Quaternion.Lerp(transform.rotation, _newRotation, Time.unscaledDeltaTime * _movementTime);
 
-        _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, _newZoom, Time.deltaTime * _movementTime);
+        _cameraTransform.localPosition = Vector3.Lerp(_cameraTransform.localPosition, _newZoom, Time.unscaledDeltaTime * _movementTime);
 
         _depthOfField.focusDistance.value = Vector3.Distance(transform.position, _cameraTransform.position);
 
-        _energyBar.localScale = Vector3.Lerp(_energyBar.localScale, _energyBarScaleFactor * Vector3.one, Time.deltaTime * _movementTime);
+        _energyBar.localScale = Vector3.Lerp(_energyBar.localScale, _energyBarScaleFactor * Vector3.one, Time.unscaledDeltaTime * _movementTime);
     }
 
     private void CheckIfFocusAnimal()

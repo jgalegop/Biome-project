@@ -15,8 +15,9 @@ public class SpawnButton : Button
     private int _findPosTries = 10;
     private Vector3 _newWorldPos = Vector3.zero;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         _grid = FindObjectOfType<PathfindGrid>();
         if (_grid == null)
             Debug.LogError("Scene needs a PathfindGrid object");

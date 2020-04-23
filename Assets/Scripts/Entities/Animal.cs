@@ -47,15 +47,6 @@ namespace Entities
 
         public FiniteStateMachine FSM { get; private set; }
 
-        /*
-        private Vector3 _prevPos;
-        private Quaternion _prevRot;
-        private Vector3 _prevSca;
-        private int _count = 0;
-        private int _maxCount = 100;
-        private bool debuggedFroze = false;
-        */
-
         private bool _foodCoroutineRunning = false;
         private Coroutine _foodIgnoreCoroutine = null;
 
@@ -218,10 +209,21 @@ namespace Entities
 
         public string GetStateName() 
         { 
-            if (FSM.CurrentState.StateName != null)
-                return FSM.CurrentState.StateName;
+
+            if (FSM.CurrentState == FSM.PreviousState)
+            {
+                if (FSM.CurrentState.StateName != null)
+                    return FSM.CurrentState.StateName;
+                else
+                    return FSM.CurrentState.ToString();
+            }
             else
-                return FSM.CurrentState.ToString();
+            {
+                if (FSM.PreviousState.StateName != null)
+                    return FSM.PreviousState.StateName;
+                else
+                    return FSM.PreviousState.ToString();
+            }
         }
         
         public string GetDietText()
@@ -323,36 +325,6 @@ namespace Entities
             _foodIgnoreCoroutine = null;
         }
 
-        public void DebugChangeColor()
-        {
-            //gameObject.GetComponentInChildren<MeshRenderer>().material.color = Color.blue;
-        }
-
-
-        /*
-        private void Update()
-        {
-            if (transform.position == _prevPos &&
-                transform.rotation == _prevRot && 
-                transform.localScale == _prevSca)
-            {
-                _count++;
-                if (_count > _maxCount && !debuggedFroze)
-                {
-                    DebugChangeColor();
-                    Debug.LogError("rabbit stayed frozen for too long, in state " + FSM.CurrentState + " and " + UnsucsesfulPathfinds + " pathfinding fails");
-                    debuggedFroze = true;
-                }
-            }
-            else
-            {
-                _count = 0;
-            }
-            _prevPos = transform.position;
-            _prevRot = transform.rotation;
-            _prevSca = transform.localScale;
-        }
-        */
 
 
         public void AnimalDebugToggle()

@@ -80,14 +80,16 @@ public class AnimalPanel : MonoBehaviour
                 DOTween.Kill(_panelImage.transform);
 
             _panelImage.transform.DOScale(Vector3.one, 0.4f)
-                                 .SetEase(Ease.OutBack);
+                                 .SetEase(Ease.OutBack)
+                                 .SetUpdate(true);
             _animalGraphic.GetComponentInChildren<MeshRenderer>().material.color = _boundAnimal.GetComponentInChildren<MeshRenderer>().material.color;
         }
         else
         {
             _panelImage.transform.DOScale(Vector3.zero, 0.4f)
                                  .SetEase(Ease.InBack)
-                                 .OnComplete(DisableAfterTween);
+                                 .OnComplete(DisableAfterTween)
+                                 .SetUpdate(true);
         }
     }
 
