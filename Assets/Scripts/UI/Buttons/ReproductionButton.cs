@@ -21,17 +21,18 @@ public class ReproductionButton : Button
             _image.color = _pressedColor;
     }
 
-    public override void ChangeSizeOnEnter()
-    {
-        if (!_isPressed)
-            base.ChangeSizeOnEnter();
-    }
 
-    public override void ChangeSizeOnExit()
-    {
-        if (!_isPressed)
-            base.ChangeSizeOnExit();
-    }
+    //public override void ChangeSizeOnEnter()
+    //{
+    //    if (!_isPressed)
+    //        base.ChangeSizeOnEnter();
+    //}
+
+    //public override void ChangeSizeOnExit()
+    //{
+    //    if (!_isPressed)
+    //        base.ChangeSizeOnExit();
+    //}
 
     public void SetIsPressed(bool isPressed)
     {

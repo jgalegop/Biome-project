@@ -15,6 +15,13 @@ public class TabGroup : MonoBehaviour
     private Color _selectedColor = Color.white;
 
     [SerializeField]
+    private Color _spriteDefaultColor = Color.white;
+    [SerializeField]
+    private Color _spriteHoverColor = Color.white;
+    [SerializeField]
+    private Color _spriteSelectedColor = Color.white;
+
+    [SerializeField]
     private List<GameObject> _tabMenus = null;
 
     private TabButton _selectedTab;
@@ -31,6 +38,7 @@ public class TabGroup : MonoBehaviour
         ResetTabs();
         if (_selectedTab != null && _selectedTab == tab) { return; }
         tab.TabImage.color = _hoverColor;
+        tab.ChangeInImageColor(_spriteHoverColor);
     }
 
     public void OnTabExit(TabButton tab)
@@ -44,12 +52,14 @@ public class TabGroup : MonoBehaviour
         {
             _selectedTab.Deselect();
             CloseTabMenu(_selectedTab);
+            _selectedTab = null;
         }
 
         ResetTabs();
 
         _selectedTab = tab;
         tab.TabImage.color = _selectedColor;
+        tab.ChangeInImageColor(_spriteSelectedColor);
         tab.Select();
         OpenTabMenu(tab);
     }
@@ -67,7 +77,8 @@ public class TabGroup : MonoBehaviour
         foreach (TabButton tab in _tabButtons)
         {
             if (_selectedTab != null && _selectedTab == tab) { continue; }
-                tab.TabImage.color = _idleColor;
+            tab.TabImage.color = _idleColor;
+            tab.ChangeInImageColor(_spriteDefaultColor);
         }
     }
 

@@ -26,28 +26,28 @@ public class SpawnNumberButton : Button
         }    
     }
 
-    public void PressButton(int spawnNumber)
-    {
-        _controller.SpawnNumber = spawnNumber;
+    //public void PressButton(int spawnNumber)
+    //{
+    //    _controller.SpawnNumber = spawnNumber;
 
-        // fixes size as it was exiting
-        ChangeSizeOnExit();
+    //    // fixes size as it was exiting
+    //    ChangeSizeOnExit();
 
-        SetIsPressed(true);
-        _otherButton.SetIsPressed(false);
-    }
+    //    SetIsPressed(true);
+    //    _otherButton.SetIsPressed(false);
+    //}
 
-    public override void ChangeSizeOnEnter()
-    {
-        if (!_isPressed)
-            base.ChangeSizeOnEnter();
-    }
+    //public override void ChangeSizeOnEnter()
+    //{
+    //    if (!_isPressed)
+    //        base.ChangeSizeOnEnter();
+    //}
 
-    public override void ChangeSizeOnExit()
-    {
-        if (!_isPressed)
-            base.ChangeSizeOnExit();
-    }
+    //public override void ChangeSizeOnExit()
+    //{
+    //    if (!_isPressed)
+    //        base.ChangeSizeOnExit();
+    //}
 
     public void SetIsPressed(bool isPressed)
     {

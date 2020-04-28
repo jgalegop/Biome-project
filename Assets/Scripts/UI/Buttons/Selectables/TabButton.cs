@@ -6,15 +6,19 @@ using UnityEngine.EventSystems;
 public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
     [SerializeField]
-    private TabGroup _tabGroup;
+    private TabGroup _tabGroup = null;
 
     public Image TabImage { get; private set; }
+    public Image InteriorImage { get; private set; }
 
     private bool _isSelected = false;
+    private Vector3 _defaultImageSize;
 
     private void Start()
     {
         TabImage = GetComponent<Image>();
+        InteriorImage = transform.GetChild(0).GetComponent<Image>(); // GetComponentInChildren searches first in parent
+        _defaultImageSize = InteriorImage.transform.localScale;
         _tabGroup.BindTab(this);
     }
 
@@ -43,10 +47,17 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
     public void Deselect()
     {
         _isSelected = false;
+        InteriorImage.transform.localScale = _defaultImageSize;
     }
 
     public void Select()
     {
         _isSelected = true;
+        InteriorImage.transform.localScale = 1.1f * _defaultImageSize;
+    }
+
+    public void ChangeInImageColor(Color color)
+    {
+        InteriorImage.color = color;
     }
 }

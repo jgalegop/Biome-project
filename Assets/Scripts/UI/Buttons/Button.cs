@@ -1,25 +1,58 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+using UnityEngine.Events;
 using DG.Tweening;
 
-public abstract class Button : MonoBehaviour
+[RequireComponent(typeof(Image))]
+public class Button : MonoBehaviour, IPointerClickHandler, IPointerEnterHandler, IPointerExitHandler
 {
-    private Vector3 _defaultScale;
-    public virtual void Awake()
+    [SerializeField]
+    private Color _idleColor = Color.white;
+    [SerializeField]
+    private Color _hoverColor = Color.white;
+    [SerializeField]
+    private Color _pressColor = Color.white;
+
+    [SerializeField]
+    private UnityEvent _onButtonClick = null;
+
+    public Image TabImage { get; private set; }
+    public Image InteriorImage { get; private set; }
+
+    private Vector3 _defaultImageSize;
+
+    private void Start()
     {
-        _defaultScale = transform.localScale;
+        TabImage = GetComponent<Image>();
+        InteriorImage = transform.GetChild(0).GetComponent<Image>(); // GetComponentInChildren searches first in parent
+        _defaultImageSize = InteriorImage.transform.localScale;
     }
 
-    public virtual void ChangeSizeOnEnter()
+    public void OnPointerEnter(PointerEventData eventData)
     {
-        transform.DOScale(1.1f * _defaultScale, 0.1f)
-                 .SetEase(Ease.OutQuint)
-                 .SetUpdate(true);
+        TabImage.color = _hoverColor;
     }
 
-    public virtual void ChangeSizeOnExit()
+    public void OnPointerExit(PointerEventData eventData)
     {
-        transform.DOScale(0.9090909f * _defaultScale, 0.1f)
-                 .SetEase(Ease.OutQuint)
-                 .SetUpdate(true);
+        TabImage.color = _idleColor;
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (DOTween.IsTweening(InteriorImage.transform))
+        {
+            DOTween.Kill(InteriorImage.transform);
+            InteriorImage.transform.localScale = _defaultImageSize;
+        }
+        InteriorImage.transform.DOPunchScale(0.2f * _defaultImageSize, 0.3f, 2, 0.5f);
+
+        _onButtonClick?.Invoke();
+    }
+
+    public void ChangeInImageColor(Color color)
+    {
+        InteriorImage.color = color;
     }
 }
