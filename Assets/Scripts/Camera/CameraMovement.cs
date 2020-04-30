@@ -1,6 +1,7 @@
 ﻿using System;
 using Entities;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Rendering.PostProcessing;
 
 public class CameraMovement : MonoBehaviour
@@ -143,21 +144,20 @@ public class CameraMovement : MonoBehaviour
 
     private void MouseDragPan()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !IsMouseOverUI())
         {
             Plane plane = new Plane(Vector3.up, Vector3.zero);
 
             Ray ray = _camera.ScreenPointToRay(Input.mousePosition);
 
             float entry;
-
             if (plane.Raycast(ray, out entry))
             {
                 _dragStartPosition = ray.GetPoint(entry);
             }
         }
 
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && !IsMouseOverUI())
         {
             Plane plane = new Plane(Vector3.up, Vector3.zero);
 
@@ -305,5 +305,10 @@ public class CameraMovement : MonoBehaviour
 
         if (_boundAnimalTransform == null)
             _animalIsFollowed = false;
+    }
+
+    private bool IsMouseOverUI()
+    {
+        return EventSystem.current.IsPointerOverGameObject();
     }
 }

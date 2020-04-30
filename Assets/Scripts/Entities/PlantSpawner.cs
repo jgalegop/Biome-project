@@ -1,12 +1,13 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Entities;
 
-public class PlantSpawner : MonoBehaviour
+public class PlantSpawner : MonoBehaviour, IDisplayableText
 {
     [SerializeField]
     [Tooltip("Chance per second to create a plant")]
-    [Range(0, 1)] private float _chanceToGrowPerSecond = 0.5f;
+    [Range(0, 1)] private float _plantsPerSecond = 0.0f;
 
     [SerializeField]
     private LivingBeing _plantPrefab = null;
@@ -16,16 +17,12 @@ public class PlantSpawner : MonoBehaviour
 
     private PathfindGrid _grid = null;
 
-    private int findPosTries = 10;
+    private readonly int findPosTries = 10;
 
     private Vector3 _newWorldPos;
+    private List<Coroutine> _runningCoroutines = new List<Coroutine>();
 
     private void Start()
-    {
-        Init();
-    }
-
-    private void OnEnable()
     {
         Init();
     }
@@ -36,16 +33,18 @@ public class PlantSpawner : MonoBehaviour
         if (_grid == null)
             Debug.LogError("Scene needs a PathfindGrid object");
 
-        StartCoroutine(ChanceToGrowPlant());
+        Coroutine growingPlants = StartCoroutine(ChanceToGrowPlant());
+        _runningCoroutines.Add(growingPlants);
     }
 
     private IEnumerator ChanceToGrowPlant()
     {
         while (true)
         {
-            yield return new WaitForSeconds(1f);
-            if (Random.Range(0f, 1f) < _chanceToGrowPerSecond &&
-                SuitablePositionFound())
+            float averagePlantTime = 1f / (_plantsPerSecond + Mathf.Epsilon);
+            float nextPlantTime = Random.Range(0.8f * averagePlantTime, 1.2f * averagePlantTime);
+            yield return new WaitForSeconds(nextPlantTime);
+            if (SuitablePositionFound())
             {
                 LivingBeing newPlant = Instantiate(_plantPrefab, _newWorldPos, Quaternion.identity);
                 newPlant.transform.parent = transform;
@@ -93,5 +92,29 @@ public class PlantSpawner : MonoBehaviour
     private bool ObstacleInArea(Vector3 pos)
     {
         return Physics.OverlapSphere(pos, 1.5f, LayerMask.GetMask("Obstacle")).Length > 0;
+    }
+
+    public void SetPlantsPerSecond(float pps)
+    {
+        _plantsPerSecond = Mathf.Clamp(pps, 0f, 2f);
+        StopPlantSpawning();
+        Coroutine growingPlants = StartCoroutine(ChanceToGrowPlant());
+        _runningCoroutines.Add(growingPlants);
+    }
+
+    private void StopPlantSpawning()
+    {
+        // this makes sure there is no multiple instances of the plant spawning coroutine
+        foreach (Coroutine co in _runningCoroutines)
+        {
+            StopCoroutine(co);
+        }
+        _runningCoroutines = new List<Coroutine>();
+    }
+
+    public T SetText<T>()
+    {
+        //Debug.Log("plants " + _plantsPerSecond);
+        return (T)System.Convert.ChangeType(_plantsPerSecond, typeof(T));
     }
 }
