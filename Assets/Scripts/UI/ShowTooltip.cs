@@ -19,4 +19,16 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         Tooltip.HideTooltip();
     }
+
+    public void SetFloatText(float number)
+    {
+        _tooltipText = number.ToString("0.0");
+        Tooltip.UpdateText(_tooltipText);
+    }
+
+    public void SetIntText(float number)
+    {
+        _tooltipText = ((int)number).ToString();
+        Tooltip.UpdateText(_tooltipText);
+    }
 }

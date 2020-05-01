@@ -2,6 +2,10 @@
 
 public class MapGenerator : MonoBehaviour
 {
+    [Header("Pathfind grid")]
+    [SerializeField]
+    private PathfindGrid _grid = null;
+
     [Header("Map parameters")]
     [SerializeField]
     private int _mapWidth = 2;
@@ -39,9 +43,12 @@ public class MapGenerator : MonoBehaviour
     [SerializeField]
     private TerrainType[] _regions = null;
 
+    public float DefaultHeight { get; private set; }
+
     private void Awake()
     {
         GenerateMap();
+        DefaultHeight = 1f;
     }
 
     public void GenerateMap()
@@ -50,12 +57,17 @@ public class MapGenerator : MonoBehaviour
 
         Color[] colormap = SetColorMap(noiseMap);
 
+        if (_waterDepth > DefaultHeight)
+            DefaultHeight += _waterDepth;
+
         // Display
-        var meshData = MeshGenerator.GenerateTerrainMesh(noiseMap, _regions[0].height, _yPosition, _waterDepth);
+        var meshData = MeshGenerator.GenerateTerrainMesh(noiseMap, _regions[0].height, _yPosition, _waterDepth, DefaultHeight);
         _mapDisplay.DrawMesh(meshData, TextureGenerator.TextureFromColormap(colormap, _mapWidth, _mapHeight));
         if (_generateObstacles)
             ObstacleGenerator.GenerateObstacleMesh(meshData);
 
+        if (_grid != null)
+            _grid.StartPathfindGrid();
     }
 
     private Color[] SetColorMap(float[,] noiseMap)
@@ -98,6 +110,49 @@ public class MapGenerator : MonoBehaviour
             _lacunarity = 1;
         if (_octaves < 0)
             _octaves = 0;
+    }
+
+
+    public void SetWidth(float width)
+    {
+        _mapWidth = (int) width;
+        GenerateMap();
+    }
+
+    public void SetHeight(float height)
+    {
+        _mapHeight = (int) height;
+        GenerateMap();
+    }
+
+    public void SetWaterDepth(float depth)
+    {
+        _waterDepth = depth;
+        GenerateMap();
+    }
+
+    public void SetSeed(string seed)
+    {
+        _seed = int.Parse(seed);
+        GenerateMap();
+    }
+
+    public void SetComplexity(float complexity)
+    {
+        _octaves = (int) complexity;
+        GenerateMap();
+    }
+
+    public void SetXOffset(float xOffset)
+    {
+        _offset += Vector2.right * (xOffset - _offset.x);
+        GenerateMap();
+    }
+
+    public void SetYOffset(float yOffset)
+    {
+        _offset += Vector2.up * (yOffset - _offset.y);
+        GenerateMap();
     }
 }
 

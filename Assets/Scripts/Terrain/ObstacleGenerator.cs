@@ -11,7 +11,7 @@ public static class ObstacleGenerator
         int width = meshData.walkableBoundary.GetLength(0);
         int height = meshData.walkableBoundary.GetLength(1);
         float yPos = meshData.yPos;
-        float bottomPos = yPos + 1f;
+        float bottomPos = yPos + meshData.defaultHeight;
 
         float topLeftX = -0.5f * width;
         float topLeftZ = 0.5f * height;
@@ -139,13 +139,6 @@ public static class ObstacleGenerator
                                 vertexAup = vertexMiddleA + Vector3.up * colliderHeight - (Vector3.up + sideDirections[i]) * epsilon;
                                 vertexB = vertexMiddleB + (Vector3.up + sideDirections[i]) * epsilon;
                                 vertexBup = vertexMiddleB + Vector3.up * colliderHeight - (Vector3.up - sideDirections[i]) * epsilon;
-                                
-                                /*
-                                vertexA = tileVertices[vertSideIndexA] + (Vector3.up - sideDirections[i]) * epsilon;
-                                vertexAup = tileVertices[vertSideIndexA] + Vector3.up * colliderHeight - (Vector3.up + sideDirections[i]) * epsilon;
-                                vertexB = tileVertices[vertSideIndexB] + (Vector3.up + sideDirections[i]) * epsilon;
-                                vertexBup = tileVertices[vertSideIndexB] + Vector3.up * colliderHeight - (Vector3.up - sideDirections[i]) * epsilon;
-                                */
                             }
                             else
                             {

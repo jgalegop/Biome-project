@@ -37,6 +37,7 @@ public class PathfindGrid : MonoBehaviour
 
         _gridSizeX = Mathf.RoundToInt(GridWorldSize.x / _nodeDiameter);
         _gridSizeY = Mathf.RoundToInt(GridWorldSize.y / _nodeDiameter);
+
         CreateGrid();
     }
 
@@ -48,7 +49,7 @@ public class PathfindGrid : MonoBehaviour
 
         for (int x = 0; x < _gridSizeX; x++)
         {
-            for (int y = 0; y < _gridSizeX; y++)
+            for (int y = 0; y < _gridSizeY; y++)
             {
                 Vector3 worldNodePoint = worldBottomLeft + (x * _nodeDiameter + _nodeRadius) * Vector3.right
                                                          + (y * _nodeDiameter + _nodeRadius) * Vector3.forward;

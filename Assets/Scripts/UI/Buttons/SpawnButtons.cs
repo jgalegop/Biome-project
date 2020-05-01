@@ -14,15 +14,24 @@ public class SpawnButtons : MonoBehaviour
     private List<GameObject> _spawnedPrefabs = new List<GameObject>();
     private List<GameObject> _spawnedPrefabParents = new List<GameObject>();
 
+    private MapGenerator _mapGen;
+    private float _spawnHeight;
+
     private void Awake()
     {
         _grid = FindObjectOfType<PathfindGrid>();
         if (_grid == null)
             Debug.LogError("scene needs a pathfindgrid object");
+
+        _mapGen = FindObjectOfType<MapGenerator>();
+        if (_grid == null)
+            Debug.LogError("scene needs a Map generator object");
     }
 
     public void SpawnPrefab(GameObject prefab)
     {
+        _spawnHeight = _mapGen.DefaultHeight;
+
         GameObject parent;
         if (!PrefabHasBeenSpawnedBefore(prefab))
         {
@@ -63,7 +72,7 @@ public class SpawnButtons : MonoBehaviour
         {
             float newX = Random.Range(-0.5f * _grid.GridWorldSize.x, +0.5f * _grid.GridWorldSize.x);
             float newY = Random.Range(-0.5f * _grid.GridWorldSize.y, +0.5f * _grid.GridWorldSize.y);
-            _newWorldPos = new Vector3(newX, 1, newY);
+            _newWorldPos = new Vector3(newX, _spawnHeight, newY);
 
             if (_grid.NodeFromWorldInput(_newWorldPos).Walkable &&
                 !ObstacleInArea(_newWorldPos))

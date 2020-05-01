@@ -28,24 +28,10 @@ public class Tooltip : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        _tooltipText.text = tooltipText;
         transform.localPosition = pos;
         _textRect.localPosition = new Vector2( _textPadding, -_textPadding);
 
-        Vector2 backgroundSize;
-        _tooltipText.enableWordWrapping = false;
-        if (_tooltipText.preferredWidth - 2f * _textPadding < _maxWidth)
-        {
-            backgroundSize = new Vector2(_tooltipText.preferredWidth + 2f * _textPadding, _tooltipText.preferredHeight + 2f * _textPadding);
-        }
-        else
-        {
-            _tooltipText.enableWordWrapping = true;
-            _textRect.sizeDelta = new Vector2(_maxWidth - 2f * _textPadding, 0);
-            backgroundSize = new Vector2(_maxWidth, _tooltipText.preferredHeight + 2f * _textPadding);
-        }
-        
-        _backgroundRect.sizeDelta = backgroundSize;
+        UpdateTooltip(tooltipText);
     }
 
     private void HideThisTooltip()
@@ -61,5 +47,34 @@ public class Tooltip : MonoBehaviour
     public static void HideTooltip()
     {
         instance.HideThisTooltip();
+    }
+
+    private void UpdateThisText(string newText)
+    {
+        UpdateTooltip(newText);
+    }
+
+    public static void UpdateText(string newText)
+    {
+        instance.UpdateThisText(newText);
+    }
+
+    private void UpdateTooltip(string tooltipText)
+    {
+        _tooltipText.text = tooltipText;
+        Vector2 backgroundSize;
+        _tooltipText.enableWordWrapping = false;
+        if (_tooltipText.preferredWidth - 2f * _textPadding < _maxWidth)
+        {
+            backgroundSize = new Vector2(_tooltipText.preferredWidth + 2f * _textPadding, _tooltipText.preferredHeight + 2f * _textPadding);
+        }
+        else
+        {
+            _tooltipText.enableWordWrapping = true;
+            _textRect.sizeDelta = new Vector2(_maxWidth - 2f * _textPadding, 0);
+            backgroundSize = new Vector2(_maxWidth, _tooltipText.preferredHeight + 2f * _textPadding);
+        }
+
+        _backgroundRect.sizeDelta = backgroundSize;
     }
 }

@@ -3,15 +3,13 @@ using System.Collections.Generic;
 
 public static class MeshGenerator
 {
-    public static MeshData GenerateTerrainMesh(float[,] heightMap, float waterThreshold, float yPos, float waterDepth)
+    public static MeshData GenerateTerrainMesh(float[,] heightMap, float waterThreshold, float yPos, float waterDepth, float defaultHeight)
     {
         int tilesWidth = heightMap.GetLength(0);
         int tilesHeight = heightMap.GetLength(1);
 
         float topLeftX = - 0.5f * tilesWidth;
         float topLeftZ = 0.5f * tilesHeight;
-
-        float defaultHeight = 1f;
 
         // convenience
         Vector2Int[] nswe = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -177,7 +175,7 @@ public static class MeshGenerator
             }
         }
 
-        return new MeshData(vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), normals.ToArray(), walkableBoundary, waterTile, yPos);
+        return new MeshData(vertices.ToArray(), triangles.ToArray(), uvs.ToArray(), normals.ToArray(), walkableBoundary, waterTile, yPos, defaultHeight);
     }
 
     private static Vector3[] NormalsArray(int size, Vector3 normal)
@@ -199,8 +197,9 @@ public static class MeshGenerator
         public bool[,] walkableBoundary;
         public bool[,] waterTile;
         public float yPos;
+        public float defaultHeight;
 
-        public MeshData(Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector3[] normals, bool[,] walkableBoundary, bool[,] waterTile, float yPos)
+        public MeshData(Vector3[] vertices, int[] triangles, Vector2[] uvs, Vector3[] normals, bool[,] walkableBoundary, bool[,] waterTile, float yPos, float defaultHeight)
         {
             this.vertices = vertices;
             this.triangles = triangles;
@@ -209,6 +208,7 @@ public static class MeshGenerator
             this.walkableBoundary = walkableBoundary;
             this.waterTile = waterTile;
             this.yPos = yPos;
+            this.defaultHeight = defaultHeight;
         }
 
         public Mesh CreateMesh()
