@@ -29,8 +29,8 @@ public class Tooltip : MonoBehaviour
         gameObject.SetActive(true);
 
         _tooltipText.text = tooltipText;
-        _backgroundRect.localPosition = pos;
-        _textRect.localPosition = new Vector2(pos.x + _textPadding, pos.y -_textPadding);
+        transform.localPosition = pos;
+        _textRect.localPosition = new Vector2( _textPadding, -_textPadding);
 
         Vector2 backgroundSize;
         _tooltipText.enableWordWrapping = false;

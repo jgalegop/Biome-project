@@ -724,10 +724,10 @@ RectTransform:
   m_Father: {fileID: 1858838123}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 19.57625, y: -31.65625}
-  m_SizeDelta: {x: 39.1525, y: 18.4375}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &114814584
 MonoBehaviour:
@@ -826,7 +826,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Set number of spawns to ten
-  _tooltipPosition: {x: -300, y: 359}
+  _tooltipPosition: {x: -300, y: 218.475}
 --- !u!108 &142022039 stripped
 Light:
   m_CorrespondingSourceObject: {fileID: 6751073702773946952, guid: a0d7498034a080b4cad5790370a5b03d,
@@ -1157,7 +1157,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &210996571
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3139,7 +3139,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 3.7350025, y: 0}
   m_SizeDelta: {x: 7.47, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3188,6 +3188,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 488554333}
+  - component: {fileID: 488554334}
   m_Layer: 5
   m_Name: LowerSlider
   m_TagString: Untagged
@@ -3211,11 +3212,25 @@ RectTransform:
   m_Father: {fileID: 210996571}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 97.575, y: -74.6125}
-  m_SizeDelta: {x: 179.15, y: 40.875}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &488554334
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 488554332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e6515a117e2f27848a1d3dc7637fe415, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _tooltipText: Set average number of plants generated per second
+  _tooltipPosition: {x: -300, y: 218.475}
 --- !u!4 &492950362 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2213110292815825699, guid: 120339b8c3ce7c34fa01df81f2d2e7fd,
@@ -3764,7 +3779,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Add entities
-  _tooltipPosition: {x: -390, y: 428}
+  _tooltipPosition: {x: -390, y: 340}
 --- !u!1 &648185723
 GameObject:
   m_ObjectHideFlags: 0
@@ -4360,10 +4375,10 @@ RectTransform:
   m_Father: {fileID: 210996571}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 97.575, y: -28.4375}
-  m_SizeDelta: {x: 179.15, y: 40.875}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &728074181
 MonoBehaviour:
@@ -4703,7 +4718,7 @@ RectTransform:
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 8.92, y: 0}
   m_SizeDelta: {x: 18.05, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -4778,10 +4793,10 @@ RectTransform:
   m_Father: {fileID: 728074180}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 66.40875, y: -20.4375}
-  m_SizeDelta: {x: 40.1525, y: 40.875}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &969107565
 MonoBehaviour:
@@ -4862,7 +4877,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Spawn trees
-  _tooltipPosition: {x: -300, y: 359}
+  _tooltipPosition: {x: -300, y: 218.475}
 --- !u!1 &985527536 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 194783600506158633, guid: 4e92058b7a8a22541a3975af8ba59b5c,
@@ -5283,7 +5298,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Terrain generation
-  _tooltipPosition: {x: -390, y: 428}
+  _tooltipPosition: {x: -390, y: 340}
 --- !u!1001 &1056197702
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6184,10 +6199,10 @@ RectTransform:
   m_Father: {fileID: 728074180}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 112.74125, y: -20.4375}
-  m_SizeDelta: {x: 40.1525, y: 40.875}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1206683485
 MonoBehaviour:
@@ -6268,7 +6283,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Spawn plants
-  _tooltipPosition: {x: -300, y: 359}
+  _tooltipPosition: {x: -300, y: 218.475}
 --- !u!1 &1210399241
 GameObject:
   m_ObjectHideFlags: 0
@@ -6366,7 +6381,7 @@ Canvas:
   m_SortingBucketNormalizedSize: 0
   m_AdditionalShaderChannelsFlag: 25
   m_SortingLayerID: 0
-  m_SortingOrder: 10
+  m_SortingOrder: 0
   m_TargetDisplay: 0
 --- !u!1 &1214392100
 GameObject:
@@ -6404,10 +6419,10 @@ RectTransform:
   m_Father: {fileID: 1858838123}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 19.57625, y: -9.21875}
-  m_SizeDelta: {x: 39.1525, y: 18.4375}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1214392102
 MonoBehaviour:
@@ -6506,7 +6521,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Set number of spawns to one
-  _tooltipPosition: {x: -300, y: 359}
+  _tooltipPosition: {x: -300, y: 218.475}
 --- !u!114 &1249041690 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6151284641374105777, guid: 3a5eb89a710b94d4698923cf13ad29a9,
@@ -6657,7 +6672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Settings
-  _tooltipPosition: {x: -390, y: 428}
+  _tooltipPosition: {x: -390, y: 340}
 --- !u!1 &1267811502
 GameObject:
   m_ObjectHideFlags: 0
@@ -6839,10 +6854,10 @@ RectTransform:
   m_Father: {fileID: 728074180}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 159.07375, y: -20.4375}
-  m_SizeDelta: {x: 40.1525, y: 40.875}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1315301497
 MonoBehaviour:
@@ -6923,7 +6938,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Spawn rabbits
-  _tooltipPosition: {x: -300, y: 359}
+  _tooltipPosition: {x: -300, y: 218.475}
 --- !u!114 &1327165710 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5168355270526288503, guid: bca17c5b0732d9242a7093e1cc0fa7c6,
@@ -7599,7 +7614,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1551715855}
   - component: {fileID: 1551715856}
-  - component: {fileID: 1551715857}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -7690,20 +7704,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1551715857
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1551715854}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e6515a117e2f27848a1d3dc7637fe415, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _tooltipText: Average number of plants generated per second
-  _tooltipPosition: {x: -300, y: 359}
 --- !u!1 &1580007273
 GameObject:
   m_ObjectHideFlags: 0
@@ -7842,7 +7842,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _tooltipText: Home
-  _tooltipPosition: {x: -390, y: 428}
+  _tooltipPosition: {x: -390, y: 340}
 --- !u!1 &1582575162
 GameObject:
   m_ObjectHideFlags: 0
@@ -8449,10 +8449,10 @@ RectTransform:
   m_Father: {fileID: 728074180}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 20.07625, y: -20.4375}
-  m_SizeDelta: {x: 40.1525, y: 40.875}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1858838124
 MonoBehaviour:
@@ -9151,9 +9151,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 640, y: -425}
+  m_AnchoredPosition: {x: 590, y: -375}
   m_SizeDelta: {x: 100, y: 100}
-  m_Pivot: {x: 0.5, y: 0.5}
+  m_Pivot: {x: 0, y: 1}
 --- !u!1 &2136026792
 GameObject:
   m_ObjectHideFlags: 0
