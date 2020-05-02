@@ -47,8 +47,8 @@ public class MapGenerator : MonoBehaviour
 
     private void Awake()
     {
-        GenerateMap();
         DefaultHeight = 1f;
+        GenerateMap();
     }
 
     public void GenerateMap()
@@ -134,6 +134,12 @@ public class MapGenerator : MonoBehaviour
     public void SetSeed(string seed)
     {
         _seed = int.Parse(seed);
+        GenerateMap();
+    }
+
+    public void SetScale(float scale)
+    {
+        _noiseScale = scale;
         GenerateMap();
     }
 
