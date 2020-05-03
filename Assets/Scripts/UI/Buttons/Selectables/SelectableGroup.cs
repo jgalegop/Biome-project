@@ -22,6 +22,9 @@ public class SelectableGroup : MonoBehaviour
 
     private SelectableButton _selectedButton;
 
+    [SerializeField]
+    private bool _cantBeUnselected = false;
+
     public void BindSelectable(SelectableButton selectable)
     {
         if (_selectableButtons == null)
@@ -44,6 +47,8 @@ public class SelectableGroup : MonoBehaviour
 
     public void OnButtonSelected(SelectableButton selectable)
     {
+        //if (selectable.InteractableWhenSelected)
+
         if (_selectedButton != null)
         {
             _selectedButton.Deselect();
@@ -62,6 +67,8 @@ public class SelectableGroup : MonoBehaviour
 
     public void OnButtonDeselected(SelectableButton selectable)
     {
+        if (_cantBeUnselected && _selectedButton == selectable)
+            return;
         selectable.Deselect();
         DeselectFunction(selectable);
         _selectedButton = null;

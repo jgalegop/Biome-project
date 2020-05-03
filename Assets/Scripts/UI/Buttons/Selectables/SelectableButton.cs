@@ -13,6 +13,8 @@ public class SelectableButton : MonoBehaviour, IPointerClickHandler, IPointerEnt
     [SerializeField]
     private bool _selectedByDefault = false;
 
+    public bool InteractableWhenSelected = false;
+
     public Image ButtonImage { get; private set; }
     public Image InteriorImage { get; private set; }
 
@@ -44,7 +46,7 @@ public class SelectableButton : MonoBehaviour, IPointerClickHandler, IPointerEnt
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (!_isSelected)
+        if (!_isSelected || InteractableWhenSelected)
         {
             _selectablesGroup.OnButtonSelected(this);
             _onButtonSelected?.Invoke();

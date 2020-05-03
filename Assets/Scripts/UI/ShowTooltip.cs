@@ -31,4 +31,10 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         _tooltipText = ((int)number).ToString();
         Tooltip.UpdateText(_tooltipText);
     }
+
+    public void SetCustomText(string text)
+    {
+        _tooltipText = text;
+        Tooltip.UpdateText(_tooltipText);
+    }
 }
