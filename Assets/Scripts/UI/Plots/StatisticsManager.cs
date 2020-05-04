@@ -1,7 +1,8 @@
 ﻿using Entities;
 using System;
+using UnityEngine;
 
-public class StatisticsManager
+public class StatisticsManager : MonoBehaviour
 {
     public static event Action<Animal> OnAnimalNumberIncreased = delegate { };
     public static event Action<Animal> OnAnimalNumberDecreased = delegate { };

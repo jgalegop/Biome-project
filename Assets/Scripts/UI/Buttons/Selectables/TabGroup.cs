@@ -26,6 +26,8 @@ public class TabGroup : MonoBehaviour
 
     private TabButton _selectedTab;
 
+    private float _tweenTime = 0.4f;
+
     public void BindTab(TabButton tab)
     {
         if (_tabButtons == null)
@@ -86,14 +88,14 @@ public class TabGroup : MonoBehaviour
     {
         int index = tab.transform.GetSiblingIndex();
         _tabMenus[index].SetActive(true);
-        _tabMenus[index].transform.DOScale(1, 0.4f)
+        _tabMenus[index].transform.DOScale(1, _tweenTime)
                                   .SetEase(Ease.OutBack)
                                   .SetUpdate(true);
     }
     private void CloseTabMenu(TabButton tab)
     {
         int index = tab.transform.GetSiblingIndex();
-        _tabMenus[index].transform.DOScale(0, 0.4f)
+        _tabMenus[index].transform.DOScale(0, _tweenTime)
                                   .SetEase(Ease.InBack)
                                   .SetUpdate(true);
         StartCoroutine(DisableMenu(_tabMenus[index]));
@@ -101,7 +103,7 @@ public class TabGroup : MonoBehaviour
 
     private IEnumerator DisableMenu(GameObject menu)
     {
-        yield return new WaitForSeconds(0.4f);
+        yield return new WaitForSecondsRealtime(_tweenTime); // if tween's setUpdate is set to true, then this is realtime
         menu.SetActive(false);
     }
 }
