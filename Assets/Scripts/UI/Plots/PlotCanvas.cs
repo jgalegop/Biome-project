@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class PlotCanvas : MonoBehaviour
 {
@@ -26,17 +27,31 @@ public class PlotCanvas : MonoBehaviour
     [SerializeField]
     private Sprite _barImage = null;
 
+    [SerializeField]
+    private Sprite _tickImage = null;
+    [SerializeField]
+    private Color _axisColor = Color.white;
+    [SerializeField]
+    private TMP_FontAsset _tickFont = null;
+
     private List<int> _data = new List<int>();
 
     private List<GameObject> _bars = new List<GameObject>();
+    private List<GameObject> _yTicks = new List<GameObject>();
+    private List<GameObject> _xTicks = new List<GameObject>();
 
     private int _maxYData;
     private int _defaultMaxYData = 12;
 
     private DataStatistics _dataStats = null;
 
+    public int YAxisPrecision { get; private set; }
+    public float XAxisPrecision { get; private set; }
 
-    private void Awake()
+    private float _fontSize = 0;
+
+
+    private void Start()
     {
         _dataStats = GetComponent<DataStatistics>();
 
@@ -54,6 +69,12 @@ public class PlotCanvas : MonoBehaviour
         _maxYData = _defaultMaxYData;
 
         CreateEmptyBars();
+
+        // precisions
+        YAxisPrecision = 5;
+        XAxisPrecision = 2f;
+
+        CreateAxisTicks();
 
         // PERHAPS THIS SHOULD BE SOMEWHERE ELSE
         DOTween.SetTweensCapacity(500, 50);
@@ -103,6 +124,18 @@ public class PlotCanvas : MonoBehaviour
         }
     }
 
+    private void CreateAxisTicks()
+    {
+        for (int y = 0; y <= _maxYData / YAxisPrecision; y++)
+        {
+            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData, (float)(y * YAxisPrecision)));
+        }
+        for (float x = _dataStats.MinXAxis; x < _dataStats.MaxXAxis; x += XAxisPrecision)
+        {
+            _xTicks.Add(CreateTick(false, _plotWidth * (x - _dataStats.MinXAxis) / (_dataStats.MaxXAxis - _dataStats.MinXAxis), x));
+        }
+    }
+
     public void UpdateData()
     {
         if (_dataStats == null)
@@ -112,7 +145,7 @@ public class PlotCanvas : MonoBehaviour
         }
 
         _data = _dataStats.GetData();
-        RenormalizeData(_data);
+        bool renormalized = RenormalizeData(_data);
 
         _barWidth = (_plotWidth / _data.Count + 1) * _barWidthFill;
 
@@ -121,12 +154,15 @@ public class PlotCanvas : MonoBehaviour
         {
             GameObject bar = _bars[i];
             UpdateBar(bar, y);
+            if (renormalized)
+                UpdateYTicks();
             i++;
         }
     }
 
-    private void RenormalizeData(List<int> data)
+    private bool RenormalizeData(List<int> data)
     {
+        bool renormalized = false;
         int maxValue = 0;
         foreach (int d in data)
         {
@@ -137,31 +173,138 @@ public class PlotCanvas : MonoBehaviour
         if (maxValue > _maxYData)
         {
             _maxYData = maxValue;
+            renormalized = true;
+        }
+        else if (maxValue < _defaultMaxYData && _maxYData != _defaultMaxYData)
+        {
+            _maxYData = _defaultMaxYData;
+            renormalized = true;
+        }
+        else if (maxValue < 0.5f * (float)_maxYData && maxValue > _defaultMaxYData)
+        {
+            _maxYData = (int)(0.5f * (float)_maxYData);
+            renormalized = true;
+        }
+
+        return renormalized;
+    }
+
+    private GameObject CreateTick(bool isVerticalAxis, float axisVal, float val)
+    {
+        GameObject tickGO = new GameObject("Tick", typeof(Image));
+        tickGO.transform.SetParent(_plotArea.transform, false);
+        Image tickImage = tickGO.GetComponent<Image>();
+        tickImage.color = _axisColor;
+
+        if (_tickImage != null)
+        {
+            tickImage.sprite = _tickImage;
+            tickImage.type = Image.Type.Sliced;
+            tickImage.fillCenter = true;
+            tickImage.pixelsPerUnitMultiplier = 20f;
+        }
+
+        RectTransform tickRect = tickGO.GetComponent<RectTransform>();
+        if (isVerticalAxis)
+        {
+            tickRect.sizeDelta = new Vector2(15f, 5f);
+            tickRect.pivot = new Vector2(0, 0f);
+            tickRect.anchoredPosition = new Vector2(0, axisVal);
         }
         else
         {
-            _maxYData = _defaultMaxYData;
+            tickRect.sizeDelta = new Vector2(5f, 15f);
+            tickRect.pivot = new Vector2(0, 0);
+            tickRect.anchoredPosition = new Vector2(axisVal, 0);
+        }
+        tickRect.anchorMin = Vector2.zero;
+        tickRect.anchorMax = Vector2.zero;
+
+        CreateTickText(isVerticalAxis, val, tickGO);
+
+        return tickGO;
+    }
+
+    private void UpdateYTicks()
+    {
+        int y = 0;
+
+        List<GameObject> ticksToRemove = new List<GameObject>();
+
+        foreach (GameObject tick in _yTicks)
+        {
+            float value = _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData;
+            tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, value);
+
+            // probably generates garbage, better from a pool
+            if (y * YAxisPrecision >= _maxYData)
+            {
+                Destroy(tick);
+                ticksToRemove.Add(tick);
+            }
+            y++;
+        }
+
+        foreach (GameObject tick in ticksToRemove)
+        {
+            _yTicks.Remove(tick);
+        }
+
+        if (y * YAxisPrecision < _maxYData)
+        {
+            for (int yy = y; yy <= _maxYData / YAxisPrecision; yy++)
+            {
+                _yTicks.Add(CreateTick(true, _plotHeight * (float)(yy * YAxisPrecision) / (float)_maxYData, (float)(yy * YAxisPrecision)));
+            }
         }
     }
 
-    private void SetData()
+    private GameObject CreateTickText(bool isVerticalAxis, float val, GameObject parent)
     {
-        if (_dataStats == null)
-        {
-            Debug.Log("null");
-            return;
-        }
+        GameObject textGO = new GameObject("Text", typeof(TextMeshProUGUI));
+        TextMeshProUGUI textTMPro = textGO.GetComponent<TextMeshProUGUI>();
+        textTMPro.color = _axisColor;
+        textTMPro.enableAutoSizing = true;
+        textTMPro.fontSizeMin = 12f;
+        textTMPro.font = _tickFont;
+        textTMPro.enableWordWrapping = false;
 
-        _data = _dataStats.GetData();
-        _maxYData = 10;
-        _barWidth = (_plotWidth / _data.Count + 1) * _barWidthFill;
+        if (val != (int)val)
+            textTMPro.text = val.ToString("0.0");
+        else
+            textTMPro.text = val.ToString();
 
-        int x = 0;
-        foreach (int y in _data)
+        textGO.transform.SetParent(parent.transform);
+
+        RectTransform textRect = textGO.GetComponent<RectTransform>();
+        if (isVerticalAxis)
         {
-            x++;
-            GameObject bar = GetBar(x, y);
-            _bars.Add(bar);
+            textRect.sizeDelta = new Vector2(15f, 8f);
+            textRect.pivot = new Vector2(1, 0.25f);
+            textRect.anchoredPosition = new Vector2(-3, 0);
+            textTMPro.alignment = TextAlignmentOptions.MidlineRight;
+            textRect.anchorMax = Vector2.zero;
         }
+        else
+        {
+            textRect.sizeDelta = new Vector2(15f, 8f);
+            textRect.pivot = new Vector2(0.5f, 1);
+            textRect.anchoredPosition = new Vector2(0, -3);
+            textTMPro.alignment = TextAlignmentOptions.Center;
+            textRect.anchorMax = Vector2.right;
+        }
+        textRect.anchorMin = Vector2.zero;
+        
+        textRect.localScale = Vector3.one;
+
+        return textGO;
+    }
+
+    public void SetAxisPrecision(float precision, bool isVerticalAxis)
+    {
+        if (isVerticalAxis)
+            YAxisPrecision = (int)precision;
+        else
+            XAxisPrecision = precision;
     }
 }

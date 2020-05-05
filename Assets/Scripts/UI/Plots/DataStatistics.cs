@@ -13,6 +13,9 @@ public class DataStatistics : MonoBehaviour
     [SerializeField]
     private float _maxMoveSpeed = 6f;
 
+    public float MinXAxis { get; private set; }
+    public float MaxXAxis { get; private set; }
+
 
     [SerializeField]
     private List<Animal> _animalList = new List<Animal>();
@@ -41,6 +44,11 @@ public class DataStatistics : MonoBehaviour
 
         StatisticsManager.OnAnimalNumberIncreased += AnimalIsBorn;
         StatisticsManager.OnAnimalNumberDecreased += AnimalHasDied;
+
+
+        // POSSIBLY CHANGE THIS
+        MinXAxis = _minMoveSpeed;
+        MaxXAxis = _maxMoveSpeed;
     }
 
     private void AnimalIsBorn(Animal animal)
