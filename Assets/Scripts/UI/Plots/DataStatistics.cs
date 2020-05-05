@@ -51,6 +51,12 @@ public class DataStatistics : MonoBehaviour
         MaxXAxis = _maxMoveSpeed;
     }
 
+    private void OnDestroy()
+    {
+        StatisticsManager.OnAnimalNumberIncreased -= AnimalIsBorn;
+        StatisticsManager.OnAnimalNumberDecreased -= AnimalHasDied;
+    }
+
     private void AnimalIsBorn(Animal animal)
     {
         _animalList.Add(animal);

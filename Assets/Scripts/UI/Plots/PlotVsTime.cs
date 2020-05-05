@@ -1,11 +1,9 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using DG.Tweening;
 using TMPro;
 
-public class PlotCanvas : MonoBehaviour
+public class PlotVsTime : MonoBehaviour
 {
     [SerializeField]
     private Image _plotArea = null;
@@ -16,16 +14,11 @@ public class PlotCanvas : MonoBehaviour
     private float _plotWidth;
     private float _plotHeight;
 
-    private float _barWidth;
+    [SerializeField]
+    private Color _pointColor = Color.white;
 
     [SerializeField]
-    private float _barWidthFill = 0.8f;
-
-    [SerializeField]
-    private Color _barColor = Color.white;
-
-    [SerializeField]
-    private Sprite _barImage = null;
+    private Sprite _pointImage = null;
 
     [SerializeField]
     private Sprite _tickImage = null;
@@ -34,25 +27,34 @@ public class PlotCanvas : MonoBehaviour
     [SerializeField]
     private TMP_FontAsset _tickFont = null;
 
-    private List<int> _data = new List<int>();
-
-    private List<GameObject> _bars = new List<GameObject>();
+    private Dictionary<float, int> _pointsData = new Dictionary<float, int>();
+    private List<GameObject> _pointsGO = new List<GameObject>();
     private List<GameObject> _yTicks = new List<GameObject>();
-    private List<GameObject> _xTicks = new List<GameObject>();
 
     private int _maxYData;
-    private int _defaultMaxYData = 12;
 
-    private DataStatistics _dataStats = null;
+    private float _maxTime = 120f;
+    private float _maxPopulation = 60f;
 
     public int YAxisPrecision { get; private set; }
     public float XAxisPrecision { get; private set; }
 
+    [SerializeField]
+    private StatisticsManager _statsManager = null;
+
+    private void Awake()
+    {
+        StatisticsManager.OnTimeDataSaved += WriteDataPoint;
+    }
+
+    private void OnDestroy()
+    {
+        StatisticsManager.OnTimeDataSaved -= WriteDataPoint;
+    }
+
 
     private void Start()
     {
-        _dataStats = GetComponent<DataStatistics>();
-
         if (_plotArea == null)
         {
             Debug.LogError("Plot area image object must be assigned");
@@ -64,128 +66,32 @@ public class PlotCanvas : MonoBehaviour
         _plotWidth = _rect.sizeDelta.x - Mathf.Abs(_plotAreaRect.offsetMin.x) - Mathf.Abs(_plotAreaRect.offsetMax.x);
         _plotHeight = _rect.sizeDelta.y - Mathf.Abs(_plotAreaRect.offsetMin.y) - Mathf.Abs(_plotAreaRect.offsetMax.y);
 
-        _maxYData = _defaultMaxYData;
-
-        CreateEmptyBars();
-
         // precisions
-        YAxisPrecision = 5;
+        YAxisPrecision = 10;
         XAxisPrecision = 2f;
-
-        CreateAxisTicks();
-
-        // PERHAPS THIS SHOULD BE SOMEWHERE ELSE
-        DOTween.SetTweensCapacity(500, 50);
     }
 
-    private GameObject GetBar(int xVal, int yVal)
+    private void WriteDataPoint(float time)
     {
-        GameObject barGO = new GameObject("Bar", typeof(Image));
-        barGO.transform.SetParent(_plotArea.transform, false);
-        Image barImage = barGO.GetComponent<Image>();
-        barImage.color = _barColor;
-        if (_barImage != null)
-        {
-            barImage.sprite = _barImage;
-            barImage.type = Image.Type.Sliced;
-            barImage.fillCenter = true;
-            barImage.pixelsPerUnitMultiplier = 10f;
-        }
+        GameObject pointGO = new GameObject("Point", typeof(Image));
+        pointGO.transform.SetParent(_plotArea.transform, false);
 
-        RectTransform barRect = barGO.GetComponent<RectTransform>();
-        barRect.sizeDelta = new Vector2(_barWidth, _plotHeight * yVal / _maxYData);
-        barRect.pivot = new Vector2(0.5f, 0);
-        barRect.anchoredPosition = new Vector2(_plotWidth * xVal / (_dataStats.NumberOfBars + 1), 0);
-        barRect.anchorMin = Vector2.zero;
-        barRect.anchorMax = Vector2.zero;
+        Image pointImg = pointGO.GetComponent<Image>();
+        pointImg.sprite = _pointImage;
+        pointImg.color = _pointColor;
+        pointImg.type = Image.Type.Sliced;
+        pointImg.fillCenter = true;
+        pointImg.pixelsPerUnitMultiplier = 0f;
 
-        barRect.SetAsFirstSibling();
-
-        return barGO;
+        RectTransform pointRect = pointGO.GetComponent<RectTransform>();
+        Vector2 point = new Vector2(time, _statsManager.PopulationInTime[time]);
+        pointRect.sizeDelta = new Vector2(5, 5);
+        pointRect.anchoredPosition = new Vector2(point.x / _maxPopulation * _plotHeight, point.y / _maxTime * _plotWidth);
+        pointRect.anchorMin = Vector2.zero;
+        pointRect.anchorMax = Vector2.zero;
+        pointRect.SetAsFirstSibling();
     }
 
-    private void UpdateBar(GameObject bar, int yVal)
-    {
-        RectTransform barRect = bar.GetComponent<RectTransform>();
-        Vector2 newSizeDelta = new Vector2(_barWidth, _plotHeight * (float)yVal / (float)_maxYData);
-        barRect.DOSizeDelta(newSizeDelta, 0.5f);
-    }
-
-    private void CreateEmptyBars()
-    {
-        _barWidth = (_plotWidth / _dataStats.NumberOfBars + 1) * _barWidthFill;
-
-        for (int i = 0; i <= _dataStats.NumberOfBars; i++)
-        {
-            GameObject bar = GetBar(i + 1, 0);
-            _bars.Add(bar);
-        }
-    }
-
-    private void CreateAxisTicks()
-    {
-        for (int y = 0; y <= _maxYData / YAxisPrecision; y++)
-        {
-            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData, (float)(y * YAxisPrecision)));
-        }
-        for (float x = _dataStats.MinXAxis; x < _dataStats.MaxXAxis; x += XAxisPrecision)
-        {
-            _xTicks.Add(CreateTick(false, _plotWidth * (x - _dataStats.MinXAxis) / (_dataStats.MaxXAxis - _dataStats.MinXAxis), x));
-        }
-    }
-
-    public void UpdateData()
-    {
-        if (_dataStats == null)
-        {
-            Debug.Log("null");
-            return;
-        }
-
-        _data = _dataStats.GetData();
-        bool renormalized = RenormalizeData(_data);
-
-        _barWidth = (_plotWidth / _data.Count + 1) * _barWidthFill;
-
-        int i = 0;
-        foreach (int y in _data)
-        {
-            GameObject bar = _bars[i];
-            UpdateBar(bar, y);
-            if (renormalized)
-                UpdateYTicks();
-            i++;
-        }
-    }
-
-    private bool RenormalizeData(List<int> data)
-    {
-        bool renormalized = false;
-        int maxValue = 0;
-        foreach (int d in data)
-        {
-            if (d > maxValue)
-                maxValue = d;
-        }
-
-        if (maxValue > _maxYData)
-        {
-            _maxYData = maxValue;
-            renormalized = true;
-        }
-        else if (maxValue < _defaultMaxYData && _maxYData != _defaultMaxYData)
-        {
-            _maxYData = _defaultMaxYData;
-            renormalized = true;
-        }
-        else if (maxValue < 0.5f * (float)_maxYData && maxValue > _defaultMaxYData)
-        {
-            _maxYData = (int)(0.5f * (float)_maxYData);
-            renormalized = true;
-        }
-
-        return renormalized;
-    }
 
     private GameObject CreateTick(bool isVerticalAxis, float axisVal, float val)
     {
