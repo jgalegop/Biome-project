@@ -6826,6 +6826,12 @@ PrefabInstance:
       propertyPath: _statsManager
       value: 
       objectReference: {fileID: 645393283}
+    - target: {fileID: 1198866880989560326, guid: 1aeb211551ef1124c894e3129394897f,
+        type: 3}
+      propertyPath: _tickImage
+      value: 
+      objectReference: {fileID: 21300000, guid: 4cb4494817f037243b8ad62754e6fd15,
+        type: 3}
     - target: {fileID: 7049687357946174828, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
       propertyPath: m_SizeDelta.x

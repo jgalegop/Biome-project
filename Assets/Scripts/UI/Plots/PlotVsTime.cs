@@ -39,7 +39,7 @@ public class PlotVsTime : MonoBehaviour
     private int _maxYData;
 
     private float _maxTime = 120f;
-    private float _maxPopulation = 60f;
+    private float _maxPopulation = 59f;
 
     public int YAxisPrecision { get; private set; }
     public float XAxisPrecision { get; private set; }
@@ -74,6 +74,9 @@ public class PlotVsTime : MonoBehaviour
         // precisions
         YAxisPrecision = 10;
         XAxisPrecision = 2f;
+
+        _maxYData = (int)_maxPopulation;
+        CreateAxisTicks();
     }
 
     private void WriteDataPoint(float time)
@@ -185,6 +188,14 @@ public class PlotVsTime : MonoBehaviour
         connectionRect.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
     }
 
+    private void CreateAxisTicks()
+    {
+        for (int y = 0; y <= _maxYData / YAxisPrecision; y++)
+        {
+            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData, (float)(y * YAxisPrecision)));
+        }
+    }
+
 
     private GameObject CreateTick(bool isVerticalAxis, float axisVal, float val)
     {
@@ -206,13 +217,13 @@ public class PlotVsTime : MonoBehaviour
         {
             tickRect.sizeDelta = new Vector2(15f, 5f);
             tickRect.pivot = new Vector2(0, 0f);
-            tickRect.anchoredPosition = new Vector2(0, axisVal);
+            tickRect.anchoredPosition = new Vector2(-tickRect.sizeDelta.y, axisVal - tickRect.sizeDelta.y); // substract axis width
         }
         else
         {
             tickRect.sizeDelta = new Vector2(5f, 15f);
             tickRect.pivot = new Vector2(0, 0);
-            tickRect.anchoredPosition = new Vector2(axisVal, 0);
+            tickRect.anchoredPosition = new Vector2(axisVal - tickRect.sizeDelta.x, -tickRect.sizeDelta.x);
         }
         tickRect.anchorMin = Vector2.zero;
         tickRect.anchorMax = Vector2.zero;
