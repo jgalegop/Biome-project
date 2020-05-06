@@ -16,7 +16,7 @@ public class StatisticsManager : MonoBehaviour
 
     public float DataTimeInterval = 10f;
 
-    public Dictionary<float, int> PopulationInTime = new Dictionary<float, int>();
+    public Dictionary<float, DataPoint> PopulationInTime = new Dictionary<float, DataPoint>();
 
     public static event Action<float> OnTimeDataSaved = delegate { };
 
@@ -36,7 +36,7 @@ public class StatisticsManager : MonoBehaviour
         while (true)
         {
             float time = Time.time - _initialTime;
-            PopulationInTime.Add(time, GetRabbitNumber());
+            PopulationInTime.Add(time, new DataPoint(time, GetRabbitNumber()));
             OnTimeDataSaved?.Invoke(time);
             yield return new WaitForSeconds(DataTimeInterval);
         }
@@ -57,5 +57,18 @@ public class StatisticsManager : MonoBehaviour
     public static int GetRabbitNumber()
     {
         return instance._rabbitNumber;
+    }
+}
+
+
+public struct DataPoint
+{
+    public float Time;
+    public int Population;
+
+    public DataPoint(float time, int pop)
+    {
+        Time = time;
+        Population = pop;
     }
 }

@@ -24,6 +24,9 @@ public class TabGroup : MonoBehaviour
     [SerializeField]
     private List<GameObject> _tabMenus = null;
 
+    [SerializeField]
+    private bool _animateComponents = true;
+
     private TabButton _selectedTab;
 
     private float _tweenTime = 0.4f;
@@ -88,16 +91,32 @@ public class TabGroup : MonoBehaviour
     {
         int index = tab.transform.GetSiblingIndex();
         _tabMenus[index].SetActive(true);
-        _tabMenus[index].transform.DOScale(1, _tweenTime)
-                                  .SetEase(Ease.OutBack)
-                                  .SetUpdate(true);
+        if (_animateComponents)
+        {
+            _tabMenus[index].transform.DOScale(1, _tweenTime)
+                                      .SetEase(Ease.OutBack)
+                                      .SetUpdate(true);
+        }
+        else
+        {
+            _tabMenus[index].transform.localScale = Vector3.one;
+        }
+        
     }
     private void CloseTabMenu(TabButton tab)
     {
         int index = tab.transform.GetSiblingIndex();
-        _tabMenus[index].transform.DOScale(0, _tweenTime)
-                                  .SetEase(Ease.InBack)
-                                  .SetUpdate(true);
+        if (_animateComponents)
+        {
+            _tabMenus[index].transform.DOScale(0, _tweenTime)
+                                      .SetEase(Ease.InBack)
+                                      .SetUpdate(true);
+        }
+        else
+        {
+            _tabMenus[index].transform.localScale = Vector3.zero;
+        }
+        
         StartCoroutine(DisableMenu(_tabMenus[index]));
     }
 

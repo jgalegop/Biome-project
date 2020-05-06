@@ -11,6 +11,9 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
     public Image TabImage { get; private set; }
     public Image InteriorImage { get; private set; }
 
+    [SerializeField]
+    private bool _startsSelected = false;
+
     private bool _isSelected = false;
     private Vector3 _defaultImageSize;
 
@@ -20,6 +23,9 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
         InteriorImage = transform.GetChild(0).GetComponent<Image>(); // GetComponentInChildren searches first in parent
         _defaultImageSize = InteriorImage.transform.localScale;
         _tabGroup.BindTab(this);
+
+        if (_startsSelected)
+            _tabGroup.OnTabSelected(this);
     }
 
     public void OnPointerEnter(PointerEventData eventData)

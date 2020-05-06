@@ -16,6 +16,8 @@ public class PlotVsTime : MonoBehaviour
 
     [SerializeField]
     private Color _pointColor = Color.white;
+    [SerializeField]
+    private Color _pointConnectionColor = Color.white;
 
     [SerializeField]
     private Sprite _pointImage = null;
@@ -27,8 +29,11 @@ public class PlotVsTime : MonoBehaviour
     [SerializeField]
     private TMP_FontAsset _tickFont = null;
 
-    private Dictionary<float, int> _pointsData = new Dictionary<float, int>();
-    private List<GameObject> _pointsGO = new List<GameObject>();
+    private List<GameObject> _dataPointsGO = new List<GameObject>();
+    private Dictionary<GameObject, DataPoint> _dataPoints = new Dictionary<GameObject, DataPoint>();
+
+    private List<GameObject> _pointConnections = new List<GameObject>();
+
     private List<GameObject> _yTicks = new List<GameObject>();
 
     private int _maxYData;
@@ -73,6 +78,22 @@ public class PlotVsTime : MonoBehaviour
 
     private void WriteDataPoint(float time)
     {
+        bool dataLimitsReached = false;
+
+        if (time > _maxTime )
+        {
+            _maxTime = time;
+            dataLimitsReached = true;
+        }
+        if (_statsManager.PopulationInTime[time].Population > _maxPopulation)
+        {
+            _maxPopulation = _statsManager.PopulationInTime[time].Population + 1;
+            dataLimitsReached = true;
+        }
+
+        if (dataLimitsReached)
+            UpdateAllPoints();
+
         GameObject pointGO = new GameObject("Point", typeof(Image));
         pointGO.transform.SetParent(_plotArea.transform, false);
 
@@ -84,12 +105,84 @@ public class PlotVsTime : MonoBehaviour
         pointImg.pixelsPerUnitMultiplier = 0f;
 
         RectTransform pointRect = pointGO.GetComponent<RectTransform>();
-        Vector2 point = new Vector2(time, _statsManager.PopulationInTime[time]);
+        Vector2 point = new Vector2(_statsManager.PopulationInTime[time].Time, _statsManager.PopulationInTime[time].Population);
         pointRect.sizeDelta = new Vector2(5, 5);
-        pointRect.anchoredPosition = new Vector2(point.x / _maxPopulation * _plotHeight, point.y / _maxTime * _plotWidth);
+        pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth, point.y / _maxPopulation * _plotHeight);
         pointRect.anchorMin = Vector2.zero;
         pointRect.anchorMax = Vector2.zero;
         pointRect.SetAsFirstSibling();
+
+        _dataPointsGO.Add(pointGO);
+        _dataPoints.Add(pointGO, _statsManager.PopulationInTime[time]);
+
+        if (_dataPointsGO.Count > 1)
+        {
+            DataPoint dataPointA = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 2]];
+            DataPoint dataPointB = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 1]];
+            Vector2 posA = new Vector2(dataPointA.Time / _maxTime * _plotWidth, dataPointA.Population / _maxPopulation * _plotHeight);
+            Vector2 posB = new Vector2(dataPointB.Time / _maxTime * _plotWidth, dataPointB.Population / _maxPopulation * _plotHeight);
+            CreateDotConnection(posA, posB);
+        }
+    }
+
+    private void UpdateAllPoints()
+    {
+        Vector2 previousPos = Vector2.zero;
+
+        for (int i = 0; i < _dataPointsGO.Count; i++)
+        {
+            GameObject pointGo = _dataPointsGO[i];
+            DataPoint dataPoint = _dataPoints[pointGo];
+            Vector2 currentPos = new Vector2(dataPoint.Time / _maxTime * _plotWidth, dataPoint.Population / _maxPopulation * _plotHeight);
+            pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos;
+                                    
+            if (i > 0)
+            {
+                int j = i - 1;
+                GameObject connectionGO = _pointConnections[j];
+                UpdateDotConnection(_pointConnections[j], previousPos, currentPos);
+            }
+
+            previousPos = currentPos;
+        }
+    }
+
+    private void CreateDotConnection(Vector2 posA, Vector2 posB)
+    {
+        float distance = Vector2.Distance(posA, posB);
+        Vector2 dir = (posB - posA).normalized;
+
+        GameObject pointConnectionGO = new GameObject("PointConnection", typeof(Image));
+        pointConnectionGO.transform.SetParent(_plotArea.transform, false);
+        Image connectionImage = pointConnectionGO.GetComponent<Image>();
+        connectionImage.color = _pointConnectionColor;
+        if (connectionImage != null)
+        {
+            connectionImage.sprite = _pointImage;
+            connectionImage.type = Image.Type.Sliced;
+            connectionImage.fillCenter = true;
+            connectionImage.pixelsPerUnitMultiplier = 30f;
+        }
+
+        RectTransform connectionRect = pointConnectionGO.GetComponent<RectTransform>();
+        connectionRect.sizeDelta = new Vector2(distance, 2f);
+        connectionRect.anchorMin = Vector2.zero;
+        connectionRect.anchorMax = Vector2.zero;
+        connectionRect.anchoredPosition = posA + dir * distance * 0.5f;
+        connectionRect.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
+
+        _pointConnections.Add(pointConnectionGO);
+    }
+
+    private void UpdateDotConnection(GameObject connectionGO, Vector2 posA, Vector2 posB)
+    {
+        float distance = Vector2.Distance(posA, posB);
+        Vector2 dir = (posB - posA).normalized;
+
+        RectTransform connectionRect = connectionGO.GetComponent<RectTransform>();
+        connectionRect.sizeDelta = new Vector2(distance, 2f);
+        connectionRect.anchoredPosition = posA + dir * distance * 0.5f;
+        connectionRect.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
     }
 
 
