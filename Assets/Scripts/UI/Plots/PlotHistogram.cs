@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using TMPro;
 
-public class PlotCanvas : MonoBehaviour
+public class PlotHistogram : MonoBehaviour
 {
     [SerializeField]
     private Image _plotArea = null;
@@ -53,7 +53,7 @@ public class PlotCanvas : MonoBehaviour
     {
         _dataStats = GetComponent<DataStatistics>();
 
-        if (_plotArea == null)
+        if (_plotArea == null && false)
         {
             Debug.LogError("Plot area image object must be assigned");
             return;
@@ -73,6 +73,8 @@ public class PlotCanvas : MonoBehaviour
         XAxisPrecision = 2f;
 
         CreateAxisTicks();
+
+        UpdateData();
 
         // PERHAPS THIS SHOULD BE SOMEWHERE ELSE
         DOTween.SetTweensCapacity(500, 50);

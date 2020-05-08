@@ -18,6 +18,10 @@ public class StatisticsManager : MonoBehaviour
 
     public Dictionary<float, DataPoint> PopulationInTime = new Dictionary<float, DataPoint>();
 
+    public List<float> TimeStamps = new List<float>();
+
+    public List<float> MoveSpeeds = new List<float>();
+
     public static event Action<float> OnTimeDataSaved = delegate { };
 
     private void Awake()
@@ -35,10 +39,11 @@ public class StatisticsManager : MonoBehaviour
     {
         while (true)
         {
+            yield return new WaitForSeconds(DataTimeInterval);
             float time = Time.time - _initialTime;
             PopulationInTime.Add(time, new DataPoint(time, GetRabbitNumber()));
+            TimeStamps.Add(time);
             OnTimeDataSaved?.Invoke(time);
-            yield return new WaitForSeconds(DataTimeInterval);
         }
     }
 
@@ -46,12 +51,14 @@ public class StatisticsManager : MonoBehaviour
     {
         OnAnimalNumberIncreased?.Invoke(animal);
         instance._rabbitNumber++;
+        instance.MoveSpeeds.Add(animal.GetAdultMoveSpeed());
     }
 
     public static void AnimalHasDied(Animal animal)
     {
         OnAnimalNumberDecreased?.Invoke(animal);
         instance._rabbitNumber--;
+        instance.MoveSpeeds.Remove(animal.GetAdultMoveSpeed());
     }
 
     public static int GetRabbitNumber()

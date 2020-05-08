@@ -111,13 +111,15 @@ public class TabGroup : MonoBehaviour
             _tabMenus[index].transform.DOScale(0, _tweenTime)
                                       .SetEase(Ease.InBack)
                                       .SetUpdate(true);
+            StartCoroutine(DisableMenu(_tabMenus[index]));
         }
         else
         {
             _tabMenus[index].transform.localScale = Vector3.zero;
+            _tabMenus[index].SetActive(false);
         }
         
-        StartCoroutine(DisableMenu(_tabMenus[index]));
+        
     }
 
     private IEnumerator DisableMenu(GameObject menu)

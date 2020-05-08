@@ -6,6 +6,9 @@ using System.Linq;
 
 public class DataStatistics : MonoBehaviour
 {
+    [SerializeField]
+    private StatisticsManager _statisticsManager = null;
+
     public int NumberOfBars = 15;
 
     [SerializeField]
@@ -31,24 +34,37 @@ public class DataStatistics : MonoBehaviour
     [SerializeField]
     private int[] _debugAnimalNumbers;
 
-    private PlotCanvas _plotCanvas;
+    private PlotHistogram _plotCanvas;
 
     private void Awake()
     {
-        _plotCanvas = GetComponent<PlotCanvas>();
+        StatisticsManager.OnAnimalNumberIncreased += AnimalIsBorn;
+        StatisticsManager.OnAnimalNumberDecreased += AnimalHasDied;
+    }
+
+    private void Start()
+    {
+        _plotCanvas = GetComponent<PlotHistogram>();
 
         _moveSpeedPoints = new float[NumberOfBars];
         _debugAnimalNumbers = new int[NumberOfBars];
         SetMoveSpeedPoints();
         SetAnimalNumberDictionary();
 
-        StatisticsManager.OnAnimalNumberIncreased += AnimalIsBorn;
-        StatisticsManager.OnAnimalNumberDecreased += AnimalHasDied;
-
-
         // POSSIBLY CHANGE THIS
         MinXAxis = _minMoveSpeed;
         MaxXAxis = _maxMoveSpeed;
+
+        if (_statisticsManager.MoveSpeeds.Count > 0)
+        {
+            foreach (float ms in _statisticsManager.MoveSpeeds)
+            {
+                float msPoint = GetClosestMoveSpeedPoint(ms);
+                _animalNumberWithMoveSpeed[msPoint]++;
+            }
+
+            _plotCanvas.UpdateData();
+        }
     }
 
     private void OnDestroy()

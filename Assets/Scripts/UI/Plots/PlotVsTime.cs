@@ -2,6 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System;
 
 public class PlotVsTime : MonoBehaviour
 {
@@ -44,6 +45,15 @@ public class PlotVsTime : MonoBehaviour
     public int YAxisPrecision { get; private set; }
     public float XAxisPrecision { get; private set; }
 
+    private float _axisWidth = 5f;
+
+    private List<GameObject> _createdElements = new List<GameObject>();
+    private List<GameObject> _elementsParents = new List<GameObject>();
+
+    private const string _pointName = "Point";
+    private const string _pointConnectionName = "PointConnection";
+    private const string _tickName = "Tick";
+
     [SerializeField]
     private StatisticsManager _statsManager = null;
 
@@ -75,8 +85,33 @@ public class PlotVsTime : MonoBehaviour
         YAxisPrecision = 10;
         XAxisPrecision = 2f;
 
+        CreatePlotElementParents();
+
         _maxYData = (int)_maxPopulation;
         CreateAxisTicks();
+
+        if (_statsManager.TimeStamps.Count > 1)
+        {
+            foreach (float time in _statsManager.TimeStamps)
+            {
+                WriteDataPoint(time);
+            }
+        }
+    }
+
+    private void CreatePlotElementParents()
+    {
+        var parentNames = new List<string> { _pointName + "s", _pointConnectionName + "s", _tickName + "s"};
+        foreach (string s in parentNames)
+        {
+            GameObject parent = new GameObject(s, typeof(RectTransform));
+            RectTransform rect = parent.GetComponent<RectTransform>();
+            rect.pivot = Vector2.zero;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.zero;
+            parent.transform.SetParent(_plotArea.transform, false);
+            _elementsParents.Add(parent);
+        }
     }
 
     private void WriteDataPoint(float time)
@@ -91,14 +126,21 @@ public class PlotVsTime : MonoBehaviour
         if (_statsManager.PopulationInTime[time].Population > _maxPopulation)
         {
             _maxPopulation = _statsManager.PopulationInTime[time].Population + 1;
+            _maxYData = (int)_maxPopulation;
             dataLimitsReached = true;
+            UpdateYTicks();
         }
 
         if (dataLimitsReached)
             UpdateAllPoints();
 
-        GameObject pointGO = new GameObject("Point", typeof(Image));
-        pointGO.transform.SetParent(_plotArea.transform, false);
+        GameObject pointGO = new GameObject(_pointName, typeof(Image), typeof(Canvas));
+        SetElementParent(pointGO);
+        //pointGO.transform.SetParent(_plotArea.transform, false);
+
+        Canvas pointCanvas = pointGO.GetComponent<Canvas>();
+        pointCanvas.overrideSorting = true;
+        pointCanvas.sortingOrder = 2;
 
         Image pointImg = pointGO.GetComponent<Image>();
         pointImg.sprite = _pointImage;
@@ -110,10 +152,10 @@ public class PlotVsTime : MonoBehaviour
         RectTransform pointRect = pointGO.GetComponent<RectTransform>();
         Vector2 point = new Vector2(_statsManager.PopulationInTime[time].Time, _statsManager.PopulationInTime[time].Population);
         pointRect.sizeDelta = new Vector2(5, 5);
-        pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth, point.y / _maxPopulation * _plotHeight);
+        pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth - 0.5f * _axisWidth, point.y / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
         pointRect.anchorMin = Vector2.zero;
         pointRect.anchorMax = Vector2.zero;
-        pointRect.SetAsFirstSibling();
+        pointRect.SetAsLastSibling();
 
         _dataPointsGO.Add(pointGO);
         _dataPoints.Add(pointGO, _statsManager.PopulationInTime[time]);
@@ -122,10 +164,16 @@ public class PlotVsTime : MonoBehaviour
         {
             DataPoint dataPointA = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 2]];
             DataPoint dataPointB = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 1]];
-            Vector2 posA = new Vector2(dataPointA.Time / _maxTime * _plotWidth, dataPointA.Population / _maxPopulation * _plotHeight);
-            Vector2 posB = new Vector2(dataPointB.Time / _maxTime * _plotWidth, dataPointB.Population / _maxPopulation * _plotHeight);
+            Vector2 posA = new Vector2(dataPointA.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, dataPointA.Population / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
+            Vector2 posB = new Vector2(dataPointB.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, dataPointB.Population / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
             CreateDotConnection(posA, posB);
         }
+    }
+
+    private void SetElementParent(GameObject element)
+    {
+        GameObject parent = _elementsParents.Find((x) => x.name == element.name + "s");
+        element.transform.SetParent(parent.transform, false);
     }
 
     private void UpdateAllPoints()
@@ -136,13 +184,12 @@ public class PlotVsTime : MonoBehaviour
         {
             GameObject pointGo = _dataPointsGO[i];
             DataPoint dataPoint = _dataPoints[pointGo];
-            Vector2 currentPos = new Vector2(dataPoint.Time / _maxTime * _plotWidth, dataPoint.Population / _maxPopulation * _plotHeight);
-            pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos;
+            Vector2 currentPos = new Vector2(dataPoint.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, dataPoint.Population / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
+            pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos; // axis correction
                                     
             if (i > 0)
             {
                 int j = i - 1;
-                GameObject connectionGO = _pointConnections[j];
                 UpdateDotConnection(_pointConnections[j], previousPos, currentPos);
             }
 
@@ -155,8 +202,14 @@ public class PlotVsTime : MonoBehaviour
         float distance = Vector2.Distance(posA, posB);
         Vector2 dir = (posB - posA).normalized;
 
-        GameObject pointConnectionGO = new GameObject("PointConnection", typeof(Image));
-        pointConnectionGO.transform.SetParent(_plotArea.transform, false);
+        GameObject pointConnectionGO = new GameObject(_pointConnectionName, typeof(Image), typeof(Canvas));
+        SetElementParent(pointConnectionGO);
+        //pointConnectionGO.transform.SetParent(_plotArea.transform, false);
+
+        Canvas pointConnectionCanvas = pointConnectionGO.GetComponent<Canvas>();
+        pointConnectionCanvas.overrideSorting = true;
+        pointConnectionCanvas.sortingOrder = 1;
+
         Image connectionImage = pointConnectionGO.GetComponent<Image>();
         connectionImage.color = _pointConnectionColor;
         if (connectionImage != null)
@@ -196,11 +249,16 @@ public class PlotVsTime : MonoBehaviour
         }
     }
 
-
     private GameObject CreateTick(bool isVerticalAxis, float axisVal, float val)
     {
-        GameObject tickGO = new GameObject("Tick", typeof(Image));
-        tickGO.transform.SetParent(_plotArea.transform, false);
+        GameObject tickGO = new GameObject(_tickName, typeof(Image), typeof(Canvas));
+        //tickGO.transform.SetParent(_plotArea.transform, false);
+        SetElementParent(tickGO);
+
+        Canvas tickCanvas = tickGO.GetComponent<Canvas>();
+        tickCanvas.overrideSorting = true;
+        tickCanvas.sortingOrder = 10;
+
         Image tickImage = tickGO.GetComponent<Image>();
         tickImage.color = _axisColor;
 
@@ -215,18 +273,20 @@ public class PlotVsTime : MonoBehaviour
         RectTransform tickRect = tickGO.GetComponent<RectTransform>();
         if (isVerticalAxis)
         {
-            tickRect.sizeDelta = new Vector2(15f, 5f);
+            tickRect.sizeDelta = new Vector2(15f, _axisWidth);
             tickRect.pivot = new Vector2(0, 0f);
-            tickRect.anchoredPosition = new Vector2(-tickRect.sizeDelta.y, axisVal - tickRect.sizeDelta.y); // substract axis width
+            tickRect.anchoredPosition = new Vector2(-_axisWidth, axisVal - _axisWidth); // substract axis width
         }
         else
         {
-            tickRect.sizeDelta = new Vector2(5f, 15f);
+            tickRect.sizeDelta = new Vector2(_axisWidth, 15f);
             tickRect.pivot = new Vector2(0, 0);
-            tickRect.anchoredPosition = new Vector2(axisVal - tickRect.sizeDelta.x, -tickRect.sizeDelta.x);
+            tickRect.anchoredPosition = new Vector2(axisVal - _axisWidth, -_axisWidth);
         }
         tickRect.anchorMin = Vector2.zero;
         tickRect.anchorMax = Vector2.zero;
+
+        tickRect.SetAsFirstSibling();
 
         CreateTickText(isVerticalAxis, val, tickGO);
 
@@ -242,7 +302,7 @@ public class PlotVsTime : MonoBehaviour
         foreach (GameObject tick in _yTicks)
         {
             float value = _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData;
-            tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, value);
+            tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(-_axisWidth, value - _axisWidth);
 
             // probably generates garbage, better from a pool
             if (y * YAxisPrecision >= _maxYData)
@@ -315,4 +375,5 @@ public class PlotVsTime : MonoBehaviour
         else
             XAxisPrecision = precision;
     }
+
 }

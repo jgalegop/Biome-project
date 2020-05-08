@@ -14,6 +14,9 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
     [SerializeField]
     private bool _startsSelected = false;
 
+    [SerializeField]
+    private bool _cantBeUnselected = false;
+
     private bool _isSelected = false;
     private Vector3 _defaultImageSize;
 
@@ -44,7 +47,7 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
         {
             _tabGroup.OnTabSelected(this);
         }
-        else
+        else if (_isSelected && !_cantBeUnselected)
         {
             _tabGroup.OnTabDeselected(this);
         }

@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
+using Entities;
 
 public class SpawnButtons : MonoBehaviour
 {
@@ -17,6 +18,11 @@ public class SpawnButtons : MonoBehaviour
     private MapGenerator _mapGen;
     private float _spawnHeight;
 
+    private bool _spawnedAnimal = false;
+
+    [SerializeField]
+    private StatisticsManager _statisticsManager = null;
+
     private void Awake()
     {
         _grid = FindObjectOfType<PathfindGrid>();
@@ -30,6 +36,12 @@ public class SpawnButtons : MonoBehaviour
 
     public void SpawnPrefab(GameObject prefab)
     {
+        if (prefab.GetComponent<Animal>() != null && !_spawnedAnimal)
+        {
+            _spawnedAnimal = true;
+            _statisticsManager.gameObject.SetActive(true);
+        }
+
         _spawnHeight = _mapGen.DefaultHeight;
 
         GameObject parent;

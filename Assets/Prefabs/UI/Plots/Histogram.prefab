@@ -581,7 +581,7 @@ GameObject:
   - component: {fileID: 368539997267304083}
   - component: {fileID: 368539997267304081}
   - component: {fileID: 368539997267304080}
-  - component: {fileID: 368539997267304175}
+  - component: {fileID: 2083568465836620644}
   - component: {fileID: 368539997267304174}
   - component: {fileID: 368539997267304172}
   m_Layer: 5
@@ -648,7 +648,7 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 5
---- !u!114 &368539997267304175
+--- !u!114 &2083568465836620644
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -657,7 +657,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 368539997267304082}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4a208c9248bf4da49b23f5d28e9d5cdb, type: 3}
+  m_Script: {fileID: 11500000, guid: 4fff47468cecc344f9ae08ec38f3d6ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _plotArea: {fileID: 368539996746793618}
