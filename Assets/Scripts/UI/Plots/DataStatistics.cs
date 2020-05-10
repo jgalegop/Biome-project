@@ -52,6 +52,8 @@ public class DataStatistics : MonoBehaviour
         SetAnimalNumberDictionary();
 
         // POSSIBLY CHANGE THIS
+        _maxMoveSpeed = _statisticsManager.MaxSpeed;
+
         MinXAxis = _minMoveSpeed;
         MaxXAxis = _maxMoveSpeed;
 

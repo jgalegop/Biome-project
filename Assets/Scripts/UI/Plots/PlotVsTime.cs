@@ -37,17 +37,18 @@ public class PlotVsTime : MonoBehaviour
 
     private List<GameObject> _yTicks = new List<GameObject>();
 
-    private int _maxYData;
-
     private float _maxTime = 120f;
-    private float _maxPopulation = 59f;
+    private float _maxYData;
 
-    public int YAxisPrecision { get; private set; }
+    private float _maxPopulation = 59f;
+    private float _maxSpeed = 10f;
+    private float _maxSenseRadius = 20f;
+
+    public float YAxisPrecision { get; private set; }
     public float XAxisPrecision { get; private set; }
 
     private float _axisWidth = 5f;
 
-    private List<GameObject> _createdElements = new List<GameObject>();
     private List<GameObject> _elementsParents = new List<GameObject>();
 
     private const string _pointName = "Point";
@@ -56,6 +57,12 @@ public class PlotVsTime : MonoBehaviour
 
     [SerializeField]
     private StatisticsManager _statsManager = null;
+
+    [SerializeField]
+    private TextMeshProUGUI _plotTitle = null;
+
+    public enum PlotMode { Population, Speed, SenseRadius}
+    private PlotMode _currentMode;
 
     private void Awake()
     {
@@ -82,12 +89,12 @@ public class PlotVsTime : MonoBehaviour
         _plotHeight = _rect.sizeDelta.y - Mathf.Abs(_plotAreaRect.offsetMin.y) - Mathf.Abs(_plotAreaRect.offsetMax.y);
 
         // precisions
-        YAxisPrecision = 10;
         XAxisPrecision = 2f;
 
         CreatePlotElementParents();
 
-        _maxYData = (int)_maxPopulation;
+        ChangePlotMode(0);
+
         CreateAxisTicks();
 
         if (_statsManager.TimeStamps.Count > 1)
@@ -116,27 +123,92 @@ public class PlotVsTime : MonoBehaviour
 
     private void WriteDataPoint(float time)
     {
+        if (PlotLimitsReached(time))
+            UpdateAllPoints();
+
+        CreatePoint(time);
+
+        if (_dataPointsGO.Count > 1)
+        {
+            DataPoint dataPointA = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 2]];
+            DataPoint dataPointB = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 1]];
+
+            float yVariableA = 0;
+            float yVariableB = 0;
+            if (_currentMode == PlotMode.Population)
+            {
+                yVariableA = dataPointA.Population;
+                yVariableB = dataPointB.Population;
+            }
+            else if (_currentMode == PlotMode.Speed)
+            {
+                yVariableA = dataPointA.Speed;
+                yVariableB = dataPointB.Speed;
+            }
+            else if (_currentMode == PlotMode.SenseRadius)
+            {
+                yVariableA = dataPointA.SenseRadius;
+                yVariableB = dataPointB.SenseRadius;
+            }
+
+            Vector2 posA = new Vector2(dataPointA.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariableA / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            Vector2 posB = new Vector2(dataPointB.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariableB / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            CreateDotConnection(posA, posB);
+        }
+    }
+
+    private bool PlotLimitsReached(float time)
+    {
         bool dataLimitsReached = false;
 
-        if (time > _maxTime )
+        if (time > _maxTime)
         {
             _maxTime = time;
             dataLimitsReached = true;
         }
+
+        // if we are looking at population
         if (_statsManager.PopulationInTime[time].Population > _maxPopulation)
         {
             _maxPopulation = _statsManager.PopulationInTime[time].Population + 1;
-            _maxYData = (int)_maxPopulation;
-            dataLimitsReached = true;
-            UpdateYTicks();
+            if (_currentMode == PlotMode.Population)
+            {
+                _maxYData = _maxPopulation;
+                dataLimitsReached = true;
+                UpdateYTicks();
+            }
         }
 
-        if (dataLimitsReached)
-            UpdateAllPoints();
+        if (_statsManager.PopulationInTime[time].Speed > _maxSpeed)
+        {
+            _maxSpeed = _statsManager.PopulationInTime[time].Speed * 1.2f;
+            _statsManager.SetMaxSpeed(_maxSpeed);
+            if (_currentMode == PlotMode.Speed)
+            {
+                _maxYData = _maxSpeed;
+                dataLimitsReached = true;
+                UpdateYTicks();
+            }
+        }
 
+        if (_statsManager.PopulationInTime[time].SenseRadius > _maxSenseRadius)
+        {
+            _maxSenseRadius = _statsManager.PopulationInTime[time].SenseRadius * 1.4f;
+            if (_currentMode == PlotMode.Speed)
+            {
+                _maxYData = _maxSenseRadius;
+                dataLimitsReached = true;
+                UpdateYTicks();
+            }
+        }
+
+        return dataLimitsReached;
+    }
+
+    private void CreatePoint(float time)
+    {
         GameObject pointGO = new GameObject(_pointName, typeof(Image), typeof(Canvas));
         SetElementParent(pointGO);
-        //pointGO.transform.SetParent(_plotArea.transform, false);
 
         Canvas pointCanvas = pointGO.GetComponent<Canvas>();
         pointCanvas.overrideSorting = true;
@@ -150,24 +222,24 @@ public class PlotVsTime : MonoBehaviour
         pointImg.pixelsPerUnitMultiplier = 0f;
 
         RectTransform pointRect = pointGO.GetComponent<RectTransform>();
-        Vector2 point = new Vector2(_statsManager.PopulationInTime[time].Time, _statsManager.PopulationInTime[time].Population);
+
+        float yVariable = 0;
+        if (_currentMode == PlotMode.Population)
+            yVariable = (float)_statsManager.PopulationInTime[time].Population;
+        else if (_currentMode == PlotMode.Speed)
+            yVariable = _statsManager.PopulationInTime[time].Speed;
+        else if (_currentMode == PlotMode.SenseRadius)
+            yVariable = _statsManager.PopulationInTime[time].SenseRadius;
+
+        Vector2 point = new Vector2(_statsManager.PopulationInTime[time].Time, yVariable);
         pointRect.sizeDelta = new Vector2(5, 5);
-        pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth - 0.5f * _axisWidth, point.y / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
+        pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth - 0.5f * _axisWidth, point.y / _maxYData * _plotHeight - 0.5f * _axisWidth);
         pointRect.anchorMin = Vector2.zero;
         pointRect.anchorMax = Vector2.zero;
         pointRect.SetAsLastSibling();
 
         _dataPointsGO.Add(pointGO);
         _dataPoints.Add(pointGO, _statsManager.PopulationInTime[time]);
-
-        if (_dataPointsGO.Count > 1)
-        {
-            DataPoint dataPointA = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 2]];
-            DataPoint dataPointB = _dataPoints[_dataPointsGO[_dataPointsGO.Count - 1]];
-            Vector2 posA = new Vector2(dataPointA.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, dataPointA.Population / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
-            Vector2 posB = new Vector2(dataPointB.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, dataPointB.Population / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
-            CreateDotConnection(posA, posB);
-        }
     }
 
     private void SetElementParent(GameObject element)
@@ -184,7 +256,16 @@ public class PlotVsTime : MonoBehaviour
         {
             GameObject pointGo = _dataPointsGO[i];
             DataPoint dataPoint = _dataPoints[pointGo];
-            Vector2 currentPos = new Vector2(dataPoint.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, dataPoint.Population / _maxPopulation * _plotHeight - 0.5f * _axisWidth);
+
+            float yVariable = 0;
+            if (_currentMode == PlotMode.Population)
+                yVariable = (float)dataPoint.Population;
+            else if (_currentMode == PlotMode.Speed)
+                yVariable = dataPoint.Speed;
+            else if (_currentMode == PlotMode.SenseRadius)
+                yVariable = dataPoint.SenseRadius;
+
+            Vector2 currentPos = new Vector2(dataPoint.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariable / _maxYData * _plotHeight - 0.5f * _axisWidth);
             pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos; // axis correction
                                     
             if (i > 0)
@@ -204,7 +285,6 @@ public class PlotVsTime : MonoBehaviour
 
         GameObject pointConnectionGO = new GameObject(_pointConnectionName, typeof(Image), typeof(Canvas));
         SetElementParent(pointConnectionGO);
-        //pointConnectionGO.transform.SetParent(_plotArea.transform, false);
 
         Canvas pointConnectionCanvas = pointConnectionGO.GetComponent<Canvas>();
         pointConnectionCanvas.overrideSorting = true;
@@ -245,14 +325,13 @@ public class PlotVsTime : MonoBehaviour
     {
         for (int y = 0; y <= _maxYData / YAxisPrecision; y++)
         {
-            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData, (float)(y * YAxisPrecision)));
+            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * YAxisPrecision) / _maxYData, (float)(y * YAxisPrecision)));
         }
     }
 
     private GameObject CreateTick(bool isVerticalAxis, float axisVal, float val)
     {
         GameObject tickGO = new GameObject(_tickName, typeof(Image), typeof(Canvas));
-        //tickGO.transform.SetParent(_plotArea.transform, false);
         SetElementParent(tickGO);
 
         Canvas tickCanvas = tickGO.GetComponent<Canvas>();
@@ -301,8 +380,12 @@ public class PlotVsTime : MonoBehaviour
 
         foreach (GameObject tick in _yTicks)
         {
-            float value = _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData;
+            float value = _plotHeight * (float)(y * YAxisPrecision) / _maxYData;
             tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(-_axisWidth, value - _axisWidth);
+
+            TextMeshProUGUI tickText = tick.GetComponentInChildren<TextMeshProUGUI>();
+            if (tickText != null)
+                UpdateTickText(tickText, y * YAxisPrecision);
 
             // probably generates garbage, better from a pool
             if (y * YAxisPrecision >= _maxYData)
@@ -322,9 +405,17 @@ public class PlotVsTime : MonoBehaviour
         {
             for (int yy = y; yy <= _maxYData / YAxisPrecision; yy++)
             {
-                _yTicks.Add(CreateTick(true, _plotHeight * (float)(yy * YAxisPrecision) / (float)_maxYData, (float)(yy * YAxisPrecision)));
+                _yTicks.Add(CreateTick(true, _plotHeight * (float)(yy * YAxisPrecision) / _maxYData, (float)(yy * YAxisPrecision)));
             }
         }
+    }
+
+    private void UpdateTickText(TextMeshProUGUI textObject, float value)
+    {
+        if (value != (int)value)
+            textObject.text = value.ToString("0.0");
+        else
+            textObject.text = value.ToString();
     }
 
     private GameObject CreateTickText(bool isVerticalAxis, float val, GameObject parent)
@@ -337,10 +428,7 @@ public class PlotVsTime : MonoBehaviour
         textTMPro.font = _tickFont;
         textTMPro.enableWordWrapping = false;
 
-        if (val != (int)val)
-            textTMPro.text = val.ToString("0.0");
-        else
-            textTMPro.text = val.ToString();
+        UpdateTickText(textTMPro, val);
 
         textGO.transform.SetParent(parent.transform);
 
@@ -376,4 +464,30 @@ public class PlotVsTime : MonoBehaviour
             XAxisPrecision = precision;
     }
 
+    public void ChangePlotMode(int mode)
+    {
+        if (mode == 0)
+        {
+            _plotTitle.text = "Rabbit population in time";
+            _currentMode = PlotMode.Population;
+            _maxYData = _maxPopulation;
+            YAxisPrecision = 10f;
+        }
+        else if (mode == 1)
+        {
+            _plotTitle.text = "Average rabbit speed in time";
+            _currentMode = PlotMode.Speed;
+            _maxYData = _maxSpeed;
+            YAxisPrecision = 2f;
+        }
+        else if (mode == 2)
+        {
+            _plotTitle.text = "Average rabbit sense radius in time";
+            _currentMode = PlotMode.SenseRadius;
+            _maxYData = _maxSenseRadius;
+            YAxisPrecision = 5f;
+        }
+        UpdateYTicks();
+        UpdateAllPoints();
+    }
 }
