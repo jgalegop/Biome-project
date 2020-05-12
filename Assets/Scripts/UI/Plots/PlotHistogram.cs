@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using DG.Tweening;
@@ -9,51 +8,51 @@ public class PlotHistogram : MonoBehaviour
 {
     [SerializeField]
     private Image _plotArea = null;
-    private RectTransform _plotAreaRect = null;
 
+    private RectTransform _plotAreaRect = null;
     private RectTransform _rect = null;
+
+    private HistogramData _dataStats = null;
 
     private float _plotWidth;
     private float _plotHeight;
-
     private float _barWidth;
 
+    [Header ("Bar properties")]
     [SerializeField]
     private float _barWidthFill = 0.8f;
-
     [SerializeField]
     private Color _barColor = Color.white;
-
     [SerializeField]
     private Sprite _barImage = null;
 
+    [Header ("Ticks and axes")]
     [SerializeField]
     private Sprite _tickImage = null;
     [SerializeField]
-    private Color _axisColor = Color.white;
-    [SerializeField]
     private TMP_FontAsset _tickFont = null;
+    [SerializeField]
+    private Color _axisColor = Color.white;    
 
     private List<int> _data = new List<int>();
-
     private List<GameObject> _bars = new List<GameObject>();
     private List<GameObject> _yTicks = new List<GameObject>();
     private List<GameObject> _xTicks = new List<GameObject>();
+    
+    private int _yAxisPrecision;
+    private float _xAxisPrecision;
 
-    private int _maxYData;
-    private int _defaultMaxYData = 12;
+    private const string _barName = "Bar";
+    private const string _tickName = "Tick";
 
-    private DataStatistics _dataStats = null;
-
-    public int YAxisPrecision { get; private set; }
-    public float XAxisPrecision { get; private set; }
+    private List<GameObject> _elementsParents = new List<GameObject>();
 
 
     private void Start()
     {
-        _dataStats = GetComponent<DataStatistics>();
+        _dataStats = GetComponent<HistogramData>();
 
-        if (_plotArea == null && false)
+        if (_plotArea == null)
         {
             Debug.LogError("Plot area image object must be assigned");
             return;
@@ -64,13 +63,13 @@ public class PlotHistogram : MonoBehaviour
         _plotWidth = _rect.sizeDelta.x - Mathf.Abs(_plotAreaRect.offsetMin.x) - Mathf.Abs(_plotAreaRect.offsetMax.x);
         _plotHeight = _rect.sizeDelta.y - Mathf.Abs(_plotAreaRect.offsetMin.y) - Mathf.Abs(_plotAreaRect.offsetMax.y);
 
-        _maxYData = _defaultMaxYData;
+        CreatePlotElementParents();
 
         CreateEmptyBars();
 
         // precisions
-        YAxisPrecision = 5;
-        XAxisPrecision = 2f;
+        _yAxisPrecision = 5;
+        _xAxisPrecision = 2f;
 
         CreateAxisTicks();
 
@@ -78,39 +77,6 @@ public class PlotHistogram : MonoBehaviour
 
         // PERHAPS THIS SHOULD BE SOMEWHERE ELSE
         DOTween.SetTweensCapacity(500, 50);
-    }
-
-    private GameObject GetBar(int xVal, int yVal)
-    {
-        GameObject barGO = new GameObject("Bar", typeof(Image));
-        barGO.transform.SetParent(_plotArea.transform, false);
-        Image barImage = barGO.GetComponent<Image>();
-        barImage.color = _barColor;
-        if (_barImage != null)
-        {
-            barImage.sprite = _barImage;
-            barImage.type = Image.Type.Sliced;
-            barImage.fillCenter = true;
-            barImage.pixelsPerUnitMultiplier = 10f;
-        }
-
-        RectTransform barRect = barGO.GetComponent<RectTransform>();
-        barRect.sizeDelta = new Vector2(_barWidth, _plotHeight * yVal / _maxYData);
-        barRect.pivot = new Vector2(0.5f, 0);
-        barRect.anchoredPosition = new Vector2(_plotWidth * xVal / (_dataStats.NumberOfBars + 1), 0);
-        barRect.anchorMin = Vector2.zero;
-        barRect.anchorMax = Vector2.zero;
-
-        barRect.SetAsFirstSibling();
-
-        return barGO;
-    }
-
-    private void UpdateBar(GameObject bar, int yVal)
-    {
-        RectTransform barRect = bar.GetComponent<RectTransform>();
-        Vector2 newSizeDelta = new Vector2(_barWidth, _plotHeight * (float)yVal / (float)_maxYData);
-        barRect.DOSizeDelta(newSizeDelta, 0.5f);
     }
 
     private void CreateEmptyBars()
@@ -124,75 +90,46 @@ public class PlotHistogram : MonoBehaviour
         }
     }
 
+    private GameObject GetBar(int xVal, int yVal)
+    {
+        GameObject barGO = new GameObject(_barName, typeof(Image), typeof(Canvas));
+        SetElementParent(barGO);
+        Image barImage = barGO.GetComponent<Image>();
+        barImage.color = _barColor;
+        if (_barImage != null)
+        {
+            barImage.sprite = _barImage;
+            barImage.type = Image.Type.Sliced;
+            barImage.fillCenter = true;
+            barImage.pixelsPerUnitMultiplier = 10f;
+        }
+
+        RectTransform barRect = barGO.GetComponent<RectTransform>();
+        barRect.sizeDelta = new Vector2(_barWidth, _plotHeight * yVal / _dataStats.MaxYData);
+        barRect.pivot = new Vector2(0.5f, 0);
+        barRect.anchoredPosition = new Vector2(_plotWidth * xVal / (_dataStats.NumberOfBars + 1), 0);
+        barRect.anchorMin = Vector2.zero;
+        barRect.anchorMax = Vector2.zero;
+
+        return barGO;
+    }
+
     private void CreateAxisTicks()
     {
-        for (int y = 0; y <= _maxYData / YAxisPrecision; y++)
+        for (int y = 0; y <= _dataStats.MaxYData / _yAxisPrecision; y++)
         {
-            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData, (float)(y * YAxisPrecision)));
+            _yTicks.Add(CreateTick(true, _plotHeight * (float)(y * _yAxisPrecision) / (float)_dataStats.MaxYData, (float)(y * _yAxisPrecision)));
         }
-        for (float x = _dataStats.MinXAxis; x < _dataStats.MaxXAxis; x += XAxisPrecision)
+        for (float x = _dataStats.MinXAxis; x < _dataStats.MaxXAxis; x += _xAxisPrecision)
         {
             _xTicks.Add(CreateTick(false, _plotWidth * (x - _dataStats.MinXAxis) / (_dataStats.MaxXAxis - _dataStats.MinXAxis), x));
         }
     }
 
-    public void UpdateData()
-    {
-        if (_dataStats == null)
-        {
-            Debug.Log("null");
-            return;
-        }
-
-        _data = _dataStats.GetData();
-        bool renormalized = RenormalizeData(_data);
-
-        _barWidth = (_plotWidth / _data.Count + 1) * _barWidthFill;
-
-        int i = 0;
-        foreach (int y in _data)
-        {
-            GameObject bar = _bars[i];
-            UpdateBar(bar, y);
-            if (renormalized)
-                UpdateYTicks();
-            i++;
-        }
-    }
-
-    private bool RenormalizeData(List<int> data)
-    {
-        bool renormalized = false;
-        int maxValue = 0;
-        foreach (int d in data)
-        {
-            if (d > maxValue)
-                maxValue = d;
-        }
-
-        if (maxValue > _maxYData)
-        {
-            _maxYData = maxValue;
-            renormalized = true;
-        }
-        else if (maxValue < _defaultMaxYData && _maxYData != _defaultMaxYData)
-        {
-            _maxYData = _defaultMaxYData;
-            renormalized = true;
-        }
-        else if (maxValue < 0.5f * (float)_maxYData && maxValue > _defaultMaxYData)
-        {
-            _maxYData = (int)(0.5f * (float)_maxYData);
-            renormalized = true;
-        }
-
-        return renormalized;
-    }
-
     private GameObject CreateTick(bool isVerticalAxis, float axisVal, float val)
     {
-        GameObject tickGO = new GameObject("Tick", typeof(Image));
-        tickGO.transform.SetParent(_plotArea.transform, false);
+        GameObject tickGO = new GameObject(_tickName, typeof(Image), typeof(Canvas));
+        SetElementParent(tickGO);
         Image tickImage = tickGO.GetComponent<Image>();
         tickImage.color = _axisColor;
 
@@ -225,40 +162,6 @@ public class PlotHistogram : MonoBehaviour
         return tickGO;
     }
 
-    private void UpdateYTicks()
-    {
-        int y = 0;
-
-        List<GameObject> ticksToRemove = new List<GameObject>();
-
-        foreach (GameObject tick in _yTicks)
-        {
-            float value = _plotHeight * (float)(y * YAxisPrecision) / (float)_maxYData;
-            tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, value);
-
-            // probably generates garbage, better from a pool
-            if (y * YAxisPrecision >= _maxYData)
-            {
-                Destroy(tick);
-                ticksToRemove.Add(tick);
-            }
-            y++;
-        }
-
-        foreach (GameObject tick in ticksToRemove)
-        {
-            _yTicks.Remove(tick);
-        }
-
-        if (y * YAxisPrecision < _maxYData)
-        {
-            for (int yy = y; yy <= _maxYData / YAxisPrecision; yy++)
-            {
-                _yTicks.Add(CreateTick(true, _plotHeight * (float)(yy * YAxisPrecision) / (float)_maxYData, (float)(yy * YAxisPrecision)));
-            }
-        }
-    }
-
     private GameObject CreateTickText(bool isVerticalAxis, float val, GameObject parent)
     {
         GameObject textGO = new GameObject("Text", typeof(TextMeshProUGUI));
@@ -269,10 +172,19 @@ public class PlotHistogram : MonoBehaviour
         textTMPro.font = _tickFont;
         textTMPro.enableWordWrapping = false;
 
+        Debug.Log(val);
+        Debug.Log(val.ToString());
         if (val != (int)val)
-            textTMPro.text = val.ToString("0.0");
+            textTMPro.text = val.ToString("00.0");
         else
-            textTMPro.text = val.ToString();
+        {
+            if (val < 10)
+                textTMPro.text = val.ToString("0");
+            else
+                textTMPro.text = val.ToString("00");
+        }
+            
+        Debug.Log(textTMPro.text);
 
         textGO.transform.SetParent(parent.transform);
 
@@ -294,17 +206,141 @@ public class PlotHistogram : MonoBehaviour
             textRect.anchorMax = Vector2.right;
         }
         textRect.anchorMin = Vector2.zero;
-        
+
         textRect.localScale = Vector3.one;
 
         return textGO;
+    }   
+
+    public void UpdateData()
+    {
+        if (_dataStats == null)
+        {
+            Debug.Log("null");
+            return;
+        }
+
+        _data = _dataStats.GetData();
+        bool renormalized = _dataStats.RenormalizeData();
+
+        _barWidth = (_plotWidth / _data.Count + 1) * _barWidthFill;
+
+        int i = 0;
+        foreach (int y in _data)
+        {
+            UpdateBar(_bars[i], y);
+            if (renormalized)
+                UpdateYTicks();
+            if (_dataStats.ChangeXAxis)
+                UpdateXTicks();
+            i++;
+        }
     }
 
-    public void SetAxisPrecision(float precision, bool isVerticalAxis)
+    private void UpdateBar(GameObject bar, int yVal)
     {
-        if (isVerticalAxis)
-            YAxisPrecision = (int)precision;
-        else
-            XAxisPrecision = precision;
+        RectTransform barRect = bar.GetComponent<RectTransform>();
+        Vector2 newSizeDelta = new Vector2(_barWidth, _plotHeight * (float)yVal / (float)_dataStats.MaxYData);
+        barRect.DOSizeDelta(newSizeDelta, 0.5f);
+    }
+
+    private void UpdateYTicks()
+    {
+        int y = 0;
+
+        List<GameObject> ticksToRemove = new List<GameObject>();
+
+        foreach (GameObject tick in _yTicks)
+        {
+            float value = _plotHeight * (float)(y * _yAxisPrecision) / (float)_dataStats.MaxYData;
+            tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, value);
+
+            // probably generates garbage, better from a pool
+            if (y * _yAxisPrecision >= _dataStats.MaxYData)
+            {
+                Destroy(tick);
+                ticksToRemove.Add(tick);
+            }
+            y++;
+        }
+
+        foreach (GameObject tick in ticksToRemove)
+        {
+            _yTicks.Remove(tick);
+        }
+
+        if (y * _yAxisPrecision < _dataStats.MaxYData)
+        {
+            for (int yy = y; yy <= _dataStats.MaxYData / _yAxisPrecision; yy++)
+            {
+                _yTicks.Add(CreateTick(true, _plotHeight * (float)(yy * _yAxisPrecision) / (float)_dataStats.MaxYData, (float)(yy * _yAxisPrecision)));
+            }
+        }
+    }
+
+
+    private void UpdateXTicks()
+    {
+        float x = _dataStats.MinXAxis;
+
+        List<GameObject> ticksToRemove = new List<GameObject>();
+
+        foreach (GameObject tick in _xTicks)
+        {
+            float value = _plotWidth * (x - _dataStats.MinXAxis) / (_dataStats.MaxXAxis - _dataStats.MinXAxis);
+            tick.GetComponent<RectTransform>().anchoredPosition = new Vector2(value, 0);
+
+            // probably generates garbage, better from a pool
+            if (x >= _dataStats.MaxXAxis)
+            {
+                Destroy(tick);
+                ticksToRemove.Add(tick);
+            }
+            x += _xAxisPrecision;
+        }
+
+        foreach (GameObject tick in ticksToRemove)
+        {
+            _xTicks.Remove(tick);
+        }
+
+        if (x  < _dataStats.MaxXAxis)
+        {
+            for (float xx = _dataStats.MinXAxis; xx < _dataStats.MaxXAxis; xx += _xAxisPrecision)
+            {
+                _xTicks.Add(CreateTick(false, _plotWidth * (xx - _dataStats.MinXAxis) / (_dataStats.MaxXAxis - _dataStats.MinXAxis), xx));
+            }
+        }
+    }
+
+
+
+    //public void SetAxisPrecision(float precision, bool isVerticalAxis)
+    //{
+    //    if (isVerticalAxis)
+    //        _yAxisPrecision = (int)precision;
+    //    else
+    //        _xAxisPrecision = precision;
+    //}
+
+    private void CreatePlotElementParents()
+    {
+        var parentNames = new List<string> { _barName + "s", _tickName + "s" };
+        foreach (string s in parentNames)
+        {
+            GameObject parent = new GameObject(s, typeof(RectTransform));
+            RectTransform rect = parent.GetComponent<RectTransform>();
+            rect.pivot = Vector2.zero;
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.zero;
+            parent.transform.SetParent(_plotArea.transform, false);
+            _elementsParents.Add(parent);
+        }
+    }
+
+    private void SetElementParent(GameObject element)
+    {
+        GameObject parent = _elementsParents.Find((x) => x.name == element.name + "s");
+        element.transform.SetParent(parent.transform, false);
     }
 }

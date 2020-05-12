@@ -196,7 +196,7 @@ namespace Entities
 
         public Type GetDiet() { return diet; }
 
-        public float GetEnergyLostPerTick() { return 2 + 0.2f * moveSpeed * moveSpeed; }
+        public float GetEnergyLostPerTick() { return 1 + 0.5f * moveSpeed * moveSpeed + 0.2f * senseRadius; }
 
 
         public Type GetState()

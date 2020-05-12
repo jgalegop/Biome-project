@@ -1,15 +1,18 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Entities;
 using System.Linq;
 
-public class DataStatistics : MonoBehaviour
+public class HistogramData : MonoBehaviour
 {
     [SerializeField]
     private StatisticsManager _statisticsManager = null;
 
     public int NumberOfBars = 15;
+
+    [SerializeField]
+    private int _defaultMaxYData = 12;
+
+    public int MaxYData { get; private set; }
 
     [SerializeField]
     private float _minMoveSpeed = 1f;
@@ -19,9 +22,6 @@ public class DataStatistics : MonoBehaviour
     public float MinXAxis { get; private set; }
     public float MaxXAxis { get; private set; }
 
-
-    [SerializeField]
-    private List<Animal> _animalList = new List<Animal>();
     [SerializeField]
     private List<float> _moveSpeedsList = new List<float>();
 
@@ -36,35 +36,38 @@ public class DataStatistics : MonoBehaviour
 
     private PlotHistogram _plotCanvas;
 
+    public bool ChangeXAxis { get; private set; }
+
     private void Awake()
     {
         StatisticsManager.OnAnimalNumberIncreased += AnimalIsBorn;
         StatisticsManager.OnAnimalNumberDecreased += AnimalHasDied;
-    }
-
-    private void Start()
-    {
-        _plotCanvas = GetComponent<PlotHistogram>();
 
         _moveSpeedPoints = new float[NumberOfBars];
         _debugAnimalNumbers = new int[NumberOfBars];
         SetMoveSpeedPoints();
         SetAnimalNumberDictionary();
 
-        // POSSIBLY CHANGE THIS
-        _maxMoveSpeed = _statisticsManager.MaxSpeed;
+        MaxYData = _defaultMaxYData;
+        ChangeXAxis = false;
 
+
+        // POSSIBLY CHANGE THIS
         MinXAxis = _minMoveSpeed;
         MaxXAxis = _maxMoveSpeed;
+    }
 
-        if (_statisticsManager.MoveSpeeds.Count > 0)
+    private void Start()
+    {
+        _plotCanvas = GetComponent<PlotHistogram>();
+
+        if (_statisticsManager.RabbitData.Count > 0)
         {
-            foreach (float ms in _statisticsManager.MoveSpeeds)
+            foreach (AnimalData ad in _statisticsManager.RabbitData)
             {
-                float msPoint = GetClosestMoveSpeedPoint(ms);
+                float msPoint = GetClosestMoveSpeedPoint(ad.speed);
                 _animalNumberWithMoveSpeed[msPoint]++;
             }
-
             _plotCanvas.UpdateData();
         }
     }
@@ -75,13 +78,15 @@ public class DataStatistics : MonoBehaviour
         StatisticsManager.OnAnimalNumberDecreased -= AnimalHasDied;
     }
 
-    private void AnimalIsBorn(Animal animal)
-    {
-        _animalList.Add(animal);
-        float ms = animal.GetAdultMoveSpeed();
-        _moveSpeedsList.Add(ms);
 
-        float msPoint = GetClosestMoveSpeedPoint(ms);
+    private void AnimalIsBorn(AnimalData animalData)
+    {
+        if (animalData.speed > _maxMoveSpeed)
+            IncreaseMaxSpeedAndReset();
+
+        _moveSpeedsList.Add(animalData.speed);
+
+        float msPoint = GetClosestMoveSpeedPoint(animalData.speed);
         _animalNumberWithMoveSpeed[msPoint]++;
 
         for (int i = 0; i < NumberOfBars; i++)
@@ -92,13 +97,11 @@ public class DataStatistics : MonoBehaviour
         _plotCanvas.UpdateData();
     }
 
-    private void AnimalHasDied(Animal animal)
+    private void AnimalHasDied(AnimalData animalData)
     {
-        _animalList.Remove(animal);
-        float ms = animal.GetAdultMoveSpeed();
-        _moveSpeedsList.Remove(ms);
+        _moveSpeedsList.Remove(animalData.speed);
 
-        float msPoint = GetClosestMoveSpeedPoint(ms);
+        float msPoint = GetClosestMoveSpeedPoint(animalData.speed);
         _animalNumberWithMoveSpeed[msPoint]--;
 
         for (int i = 0; i < NumberOfBars; i++)
@@ -108,7 +111,6 @@ public class DataStatistics : MonoBehaviour
 
         _plotCanvas.UpdateData();
     }
-
 
     private void SetAnimalNumberDictionary()
     {
@@ -142,12 +144,69 @@ public class DataStatistics : MonoBehaviour
                 return _moveSpeedPoints[i - 1];
             }
         }
+
         Debug.Log("MoveSpeed " + moveSpeed + " outside of range");
-        return 100;
+        return _moveSpeedPoints[_moveSpeedPoints.Length - 1];
     }
 
     public List<int> GetData()
     {
         return _animalNumberWithMoveSpeed.Values.ToList();
+    }
+
+    public bool RenormalizeData()
+    {
+        List<int> data = GetData();
+
+        bool renormalized = false;
+        int maxValue = 0;
+        foreach (int d in data)
+        {
+            if (d > maxValue)
+                maxValue = d;
+        }
+
+        if (maxValue > MaxYData)
+        {
+            MaxYData = maxValue;
+            renormalized = true;
+        }
+        else if (maxValue < _defaultMaxYData && MaxYData != _defaultMaxYData)
+        {
+            MaxYData = _defaultMaxYData;
+            renormalized = true;
+        }
+        else if (maxValue < 0.5f * (float)MaxYData && maxValue > _defaultMaxYData)
+        {
+            MaxYData = (int)(0.5f * (float)MaxYData);
+            renormalized = true;
+        }
+
+        return renormalized;
+    }
+
+    private void IncreaseMaxSpeedAndReset()
+    {
+        _maxMoveSpeed *= 1.2f;
+
+        MinXAxis = _minMoveSpeed;
+        MaxXAxis = _maxMoveSpeed;
+
+        SetMoveSpeedPoints();
+        _animalNumberWithMoveSpeed = new Dictionary<float, int>();
+        SetAnimalNumberDictionary();
+
+        foreach (AnimalData ad in _statisticsManager.RabbitData)
+        {
+            float msPoint = GetClosestMoveSpeedPoint(ad.speed);
+            _animalNumberWithMoveSpeed[msPoint]++;
+        }
+        ChangeXAxis = true;
+        _plotCanvas.UpdateData();
+    }
+
+    private void ChangeMaxSenseRadius(float newMaxSenseRadius)
+    {
+
     }
 }

@@ -6,45 +6,53 @@ using UnityEngine;
 
 public class StatisticsManager : MonoBehaviour
 {
-    public static event Action<Animal> OnAnimalNumberIncreased = delegate { };
-    public static event Action<Animal> OnAnimalNumberDecreased = delegate { };
-
     private static StatisticsManager instance;
 
-    private int _rabbitNumber = 0;
-    private float _initialTime;
-
-    public float MaxSpeed { get; private set; }
-
-    public float DataTimeInterval = 10f;
-
-    public Dictionary<float, DataPoint> PopulationInTime = new Dictionary<float, DataPoint>();
-
-    public List<float> TimeStamps = new List<float>();
-    public List<float> MoveSpeeds = new List<float>();
-    public List<float> SenseRadii = new List<float>();
+    public static event Action<AnimalData> OnAnimalNumberIncreased = delegate { };
+    public static event Action<AnimalData> OnAnimalNumberDecreased = delegate { };
 
     public static event Action<float> OnTimeDataSaved = delegate { };
 
+    private float _initialTime;
+    public float DataTimeInterval = 10f;
+    private bool _firstAnimalIsBorn = false;
+
+    public List<float> TimeStamps = new List<float>();
+    public Dictionary<float, DataPoint> PopulationInTime = new Dictionary<float, DataPoint>();
+
+    public List<AnimalData> RabbitData = new List<AnimalData>();
+
+
+
+    public float MaxSpeed { get; private set; }
+    public static event Action<float> OnMaxSpeedChanged = delegate { };
+    public static event Action<float> OnMaxSenseRadiusChanged = delegate { };
+
+    
+
+    
+
     private void Awake()
     {
-        instance = this;
-        _initialTime = Time.time;
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(this);
+        
         MaxSpeed = 10f;
-    }
-
-    private void Start()
-    {
-        StartCoroutine(GatherData());
     }
 
     private IEnumerator GatherData()
     {
+        _initialTime = Time.time;
         while (true)
         {
             yield return new WaitForSeconds(DataTimeInterval);
             float time = Time.time - _initialTime;
-            PopulationInTime.Add(time, new DataPoint(time, _rabbitNumber, GetAverageSpeed(), GetAverageSenseRadius()));
+
+            // FOR NOW ONLY WORKING FOR RABBIT
+            AnimalData averageData = GetAverageAnimalData(RabbitData);
+            PopulationInTime.Add(time, new DataPoint(time, RabbitData.Count, averageData.speed, averageData.senseRadius));
             TimeStamps.Add(time);
             OnTimeDataSaved?.Invoke(time);
         }
@@ -52,64 +60,72 @@ public class StatisticsManager : MonoBehaviour
 
     public static void AnimalIsBorn(Animal animal)
     {
-        OnAnimalNumberIncreased?.Invoke(animal);
-        instance._rabbitNumber++;
-        instance.MoveSpeeds.Add(animal.GetAdultMoveSpeed());
-        instance.SenseRadii.Add(animal.GetSenseRadius());
+        AnimalData aData = new AnimalData(animal.GetAdultMoveSpeed(), animal.GetSenseRadius());
+        instance.RabbitData.Add(aData);
+        OnAnimalNumberIncreased?.Invoke(aData);
+        
+
+        if (!instance._firstAnimalIsBorn)
+        {
+            instance.StartCoroutine(instance.GatherData());
+            instance._firstAnimalIsBorn = true;
+        }
     }
 
     public static void AnimalHasDied(Animal animal)
     {
-        OnAnimalNumberDecreased?.Invoke(animal);
-        instance._rabbitNumber--;
-        instance.MoveSpeeds.Remove(animal.GetAdultMoveSpeed());
-        instance.SenseRadii.Remove(animal.GetSenseRadius());
+        AnimalData aData = new AnimalData(animal.GetAdultMoveSpeed(), animal.GetSenseRadius());
+        instance.RabbitData.Remove(aData);
+        OnAnimalNumberDecreased?.Invoke(aData);
     }
 
-    public int GetRabbitNumber()
-    {
-        return _rabbitNumber;
-    }
-
-    public float GetAverageSpeed()
+    private AnimalData GetAverageAnimalData(List<AnimalData> animalData)
     {
         float moveSpeedSum = 0;
-        foreach (float ms in MoveSpeeds)
-        {
-            moveSpeedSum += ms;
-        }
-        return moveSpeedSum / (float) _rabbitNumber;
-    }
-
-    public float GetAverageSenseRadius()
-    {
         float senseRadiusSum = 0;
-        foreach (float sr in SenseRadii)
+        foreach (AnimalData ad in animalData)
         {
-            senseRadiusSum += sr;
+            moveSpeedSum += ad.speed;
+            senseRadiusSum += ad.senseRadius;
         }
-        return senseRadiusSum / (float)_rabbitNumber;
+        float avgSpeed = moveSpeedSum / (float)animalData.Count;
+        float avgSenseRadius = senseRadiusSum / (float)animalData.Count;
+        return new AnimalData(avgSpeed, avgSenseRadius);
     }
 
     public void SetMaxSpeed(float newSpeed)
     {
+        Debug.Log("new max speed is set");
         MaxSpeed = newSpeed;
+        OnMaxSpeedChanged?.Invoke(newSpeed);
     }
 }
 
 
 public struct DataPoint
 {
-    public float Time;
-    public int Population;
-    public float Speed;
-    public float SenseRadius;
+    public float time;
+    public int population;
+    public float averageSpeed;
+    public float averageSenseRadius;
 
-    public DataPoint(float time, int pop, float speed, float senseRad)
+    public DataPoint(float time, int population, float averageSpeed, float averageSenseRadius)
     {
-        Time = time;
-        Population = pop;
-        Speed = speed;
-        SenseRadius = senseRad;
+        this.time = time;
+        this.population = population;
+        this.averageSpeed = averageSpeed;
+        this.averageSenseRadius = averageSenseRadius;
+    }
+}
+
+public struct AnimalData
+{
+    public float speed;
+    public float senseRadius;
+
+    public AnimalData(float speed, float senseRadius)
+    {
+        this.speed = speed;
+        this.senseRadius = senseRadius;
     }
 }

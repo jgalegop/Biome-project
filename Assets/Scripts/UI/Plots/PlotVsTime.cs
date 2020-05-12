@@ -137,22 +137,22 @@ public class PlotVsTime : MonoBehaviour
             float yVariableB = 0;
             if (_currentMode == PlotMode.Population)
             {
-                yVariableA = dataPointA.Population;
-                yVariableB = dataPointB.Population;
+                yVariableA = dataPointA.population;
+                yVariableB = dataPointB.population;
             }
             else if (_currentMode == PlotMode.Speed)
             {
-                yVariableA = dataPointA.Speed;
-                yVariableB = dataPointB.Speed;
+                yVariableA = dataPointA.averageSpeed;
+                yVariableB = dataPointB.averageSpeed;
             }
             else if (_currentMode == PlotMode.SenseRadius)
             {
-                yVariableA = dataPointA.SenseRadius;
-                yVariableB = dataPointB.SenseRadius;
+                yVariableA = dataPointA.averageSenseRadius;
+                yVariableB = dataPointB.averageSenseRadius;
             }
 
-            Vector2 posA = new Vector2(dataPointA.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariableA / _maxYData * _plotHeight - 0.5f * _axisWidth);
-            Vector2 posB = new Vector2(dataPointB.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariableB / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            Vector2 posA = new Vector2(dataPointA.time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariableA / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            Vector2 posB = new Vector2(dataPointB.time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariableB / _maxYData * _plotHeight - 0.5f * _axisWidth);
             CreateDotConnection(posA, posB);
         }
     }
@@ -168,9 +168,9 @@ public class PlotVsTime : MonoBehaviour
         }
 
         // if we are looking at population
-        if (_statsManager.PopulationInTime[time].Population > _maxPopulation)
+        if (_statsManager.PopulationInTime[time].population > _maxPopulation)
         {
-            _maxPopulation = _statsManager.PopulationInTime[time].Population + 1;
+            _maxPopulation = _statsManager.PopulationInTime[time].population + 1;
             if (_currentMode == PlotMode.Population)
             {
                 _maxYData = _maxPopulation;
@@ -179,9 +179,9 @@ public class PlotVsTime : MonoBehaviour
             }
         }
 
-        if (_statsManager.PopulationInTime[time].Speed > _maxSpeed)
+        if (_statsManager.PopulationInTime[time].averageSpeed > _maxSpeed)
         {
-            _maxSpeed = _statsManager.PopulationInTime[time].Speed * 1.2f;
+            _maxSpeed = _statsManager.PopulationInTime[time].averageSpeed * 1.2f;
             _statsManager.SetMaxSpeed(_maxSpeed);
             if (_currentMode == PlotMode.Speed)
             {
@@ -191,10 +191,10 @@ public class PlotVsTime : MonoBehaviour
             }
         }
 
-        if (_statsManager.PopulationInTime[time].SenseRadius > _maxSenseRadius)
+        if (_statsManager.PopulationInTime[time].averageSenseRadius > _maxSenseRadius)
         {
-            _maxSenseRadius = _statsManager.PopulationInTime[time].SenseRadius * 1.4f;
-            if (_currentMode == PlotMode.Speed)
+            _maxSenseRadius = _statsManager.PopulationInTime[time].averageSenseRadius * 1.4f;
+            if (_currentMode == PlotMode.SenseRadius)
             {
                 _maxYData = _maxSenseRadius;
                 dataLimitsReached = true;
@@ -225,13 +225,13 @@ public class PlotVsTime : MonoBehaviour
 
         float yVariable = 0;
         if (_currentMode == PlotMode.Population)
-            yVariable = (float)_statsManager.PopulationInTime[time].Population;
+            yVariable = (float)_statsManager.PopulationInTime[time].population;
         else if (_currentMode == PlotMode.Speed)
-            yVariable = _statsManager.PopulationInTime[time].Speed;
+            yVariable = _statsManager.PopulationInTime[time].averageSpeed;
         else if (_currentMode == PlotMode.SenseRadius)
-            yVariable = _statsManager.PopulationInTime[time].SenseRadius;
+            yVariable = _statsManager.PopulationInTime[time].averageSenseRadius;
 
-        Vector2 point = new Vector2(_statsManager.PopulationInTime[time].Time, yVariable);
+        Vector2 point = new Vector2(_statsManager.PopulationInTime[time].time, yVariable);
         pointRect.sizeDelta = new Vector2(5, 5);
         pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth - 0.5f * _axisWidth, point.y / _maxYData * _plotHeight - 0.5f * _axisWidth);
         pointRect.anchorMin = Vector2.zero;
@@ -259,13 +259,13 @@ public class PlotVsTime : MonoBehaviour
 
             float yVariable = 0;
             if (_currentMode == PlotMode.Population)
-                yVariable = (float)dataPoint.Population;
+                yVariable = (float)dataPoint.population;
             else if (_currentMode == PlotMode.Speed)
-                yVariable = dataPoint.Speed;
+                yVariable = dataPoint.averageSpeed;
             else if (_currentMode == PlotMode.SenseRadius)
-                yVariable = dataPoint.SenseRadius;
+                yVariable = dataPoint.averageSenseRadius;
 
-            Vector2 currentPos = new Vector2(dataPoint.Time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariable / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            Vector2 currentPos = new Vector2(dataPoint.time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariable / _maxYData * _plotHeight - 0.5f * _axisWidth);
             pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos; // axis correction
                                     
             if (i > 0)
@@ -456,13 +456,13 @@ public class PlotVsTime : MonoBehaviour
         return textGO;
     }
 
-    public void SetAxisPrecision(float precision, bool isVerticalAxis)
-    {
-        if (isVerticalAxis)
-            YAxisPrecision = (int)precision;
-        else
-            XAxisPrecision = precision;
-    }
+    //public void SetAxisPrecision(float precision, bool isVerticalAxis)
+    //{
+    //    if (isVerticalAxis)
+    //        YAxisPrecision = (int)precision;
+    //    else
+    //        XAxisPrecision = precision;
+    //}
 
     public void ChangePlotMode(int mode)
     {

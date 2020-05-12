@@ -2478,7 +2478,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &645393282
 Transform:
   m_ObjectHideFlags: 0
@@ -2507,8 +2507,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DataTimeInterval: 5
   TimeStamps: []
-  MoveSpeeds: []
-  SenseRadii: []
 --- !u!1 &656343342
 GameObject:
   m_ObjectHideFlags: 0
@@ -8085,7 +8083,7 @@ PrefabInstance:
     - target: {fileID: 7049687357946174828, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7049687357946174829, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
@@ -8105,7 +8103,7 @@ PrefabInstance:
     - target: {fileID: 7049687358121658374, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 7049687358121658375, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
@@ -8130,7 +8128,7 @@ PrefabInstance:
     - target: {fileID: 7049687359530081350, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7049687359530081351, guid: 1aeb211551ef1124c894e3129394897f,
         type: 3}
@@ -8236,6 +8234,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8656628885194844244, guid: 1aeb211551ef1124c894e3129394897f,
+        type: 3}
+      propertyPath: _barWidthFill
+      value: 0.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1aeb211551ef1124c894e3129394897f, type: 3}

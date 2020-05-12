@@ -22,6 +22,7 @@ public class Mating : State
     public Mating(Animal animal) : base(animal.gameObject)
     {
         _animal = animal;
+        _energyCost = _animal.GetEnergyLostPerTick();
     }
 
     public override Type Tick()
