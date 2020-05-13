@@ -45,13 +45,16 @@ public class StatisticsManager : MonoBehaviour
     private IEnumerator GatherData()
     {
         _initialTime = Time.time;
+
+        AnimalData averageData;
+
         while (true)
         {
             yield return new WaitForSeconds(DataTimeInterval);
             float time = Time.time - _initialTime;
 
             // FOR NOW ONLY WORKING FOR RABBIT
-            AnimalData averageData = GetAverageAnimalData(RabbitData);
+            averageData = GetAverageAnimalData(RabbitData);
             PopulationInTime.Add(time, new DataPoint(time, RabbitData.Count, averageData.speed, averageData.senseRadius));
             TimeStamps.Add(time);
             OnTimeDataSaved?.Invoke(time);

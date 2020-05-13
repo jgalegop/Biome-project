@@ -40,8 +40,8 @@ public class PlotVsTime : MonoBehaviour
     private float _maxTime = 120f;
     private float _maxYData;
 
-    private float _maxPopulation = 59f;
-    private float _maxSpeed = 10f;
+    private float _maxPopulation = 29f;
+    private float _maxSpeed = 7f;
     private float _maxSenseRadius = 20f;
 
     public float YAxisPrecision { get; private set; }
@@ -64,6 +64,9 @@ public class PlotVsTime : MonoBehaviour
     public enum PlotMode { Population, Speed, SenseRadius}
     private PlotMode _currentMode;
 
+    [SerializeField]
+    private int _maxNumberOfPoints = 100;
+
     private void Awake()
     {
         StatisticsManager.OnTimeDataSaved += WriteDataPoint;
@@ -73,7 +76,6 @@ public class PlotVsTime : MonoBehaviour
     {
         StatisticsManager.OnTimeDataSaved -= WriteDataPoint;
     }
-
 
     private void Start()
     {
@@ -97,11 +99,22 @@ public class PlotVsTime : MonoBehaviour
 
         CreateAxisTicks();
 
-        if (_statsManager.TimeStamps.Count > 1)
+        if (_statsManager.TimeStamps.Count > 1 && !ReachedMaxPoints())
         {
             foreach (float time in _statsManager.TimeStamps)
             {
                 WriteDataPoint(time);
+            }
+        }
+        else if (ReachedMaxPoints())
+        {
+            float lastTime = _statsManager.TimeStamps[_statsManager.TimeStamps.Count - 1];
+            _maxTime = (lastTime > _maxTime) ? lastTime : _maxTime;
+
+            for (int i = 0; i < _maxNumberOfPoints; i++)
+            {
+                float time = (i + 1) / _maxNumberOfPoints * _maxTime;
+                CreatePointAndConnection(time);
             }
         }
     }
@@ -126,6 +139,14 @@ public class PlotVsTime : MonoBehaviour
         if (PlotLimitsReached(time))
             UpdateAllPoints();
 
+        if (ReachedMaxPoints())
+            return;
+
+        CreatePointAndConnection(time);
+    }
+
+    private void CreatePointAndConnection(float time)
+    {
         CreatePoint(time);
 
         if (_dataPointsGO.Count > 1)
@@ -252,30 +273,71 @@ public class PlotVsTime : MonoBehaviour
     {
         Vector2 previousPos = Vector2.zero;
 
+        int j = 0;
         for (int i = 0; i < _dataPointsGO.Count; i++)
         {
             GameObject pointGo = _dataPointsGO[i];
             DataPoint dataPoint = _dataPoints[pointGo];
 
-            float yVariable = 0;
-            if (_currentMode == PlotMode.Population)
-                yVariable = (float)dataPoint.population;
-            else if (_currentMode == PlotMode.Speed)
-                yVariable = dataPoint.averageSpeed;
-            else if (_currentMode == PlotMode.SenseRadius)
-                yVariable = dataPoint.averageSenseRadius;
+            Vector2 currentPos;
 
-            Vector2 currentPos = new Vector2(dataPoint.time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariable / _maxYData * _plotHeight - 0.5f * _axisWidth);
-            pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos; // axis correction
-                                    
+            if (!ReachedMaxPoints())
+            {
+                float yVariable = 0;
+                if (_currentMode == PlotMode.Population)
+                    yVariable = (float)dataPoint.population;
+                else if (_currentMode == PlotMode.Speed)
+                    yVariable = dataPoint.averageSpeed;
+                else if (_currentMode == PlotMode.SenseRadius)
+                    yVariable = dataPoint.averageSenseRadius;
+
+                // axis correction
+                currentPos = new Vector2(dataPoint.time / _maxTime * _plotWidth - 0.5f * _axisWidth, yVariable / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            }
+            else
+            {
+                float time = _statsManager.TimeStamps[j];
+                float difference = 100;
+                float xVal = _dataPointsGO[i].GetComponent<RectTransform>().anchoredPosition.x;
+                float yVariable = 0;
+
+                while (Mathf.Abs(xVal - time / _maxTime * _plotWidth - 0.5f * _axisWidth) < difference)
+                {
+                    if (_currentMode == PlotMode.Population)
+                        yVariable = (float)_statsManager.PopulationInTime[time].population;
+                    else if (_currentMode == PlotMode.Speed)
+                        yVariable = _statsManager.PopulationInTime[time].averageSpeed;
+                    else if (_currentMode == PlotMode.SenseRadius)
+                        yVariable = _statsManager.PopulationInTime[time].averageSenseRadius;
+
+                    difference = Mathf.Abs(xVal - time / _maxTime * _plotWidth - 0.5f * _axisWidth);
+
+                    j++;
+                    if (j >= _statsManager.TimeStamps.Count)
+                        break;
+                    else
+                        time = _statsManager.TimeStamps[j];
+                }
+
+                // axis correction
+                currentPos = new Vector2(xVal, yVariable / _maxYData * _plotHeight - 0.5f * _axisWidth);
+            }
+
+            pointGo.GetComponent<RectTransform>().anchoredPosition = currentPos;
+
             if (i > 0)
             {
-                int j = i - 1;
-                UpdateDotConnection(_pointConnections[j], previousPos, currentPos);
+                int k = i - 1;
+                UpdateDotConnection(_pointConnections[k], previousPos, currentPos);
             }
 
             previousPos = currentPos;
         }
+    }
+
+    private bool ReachedMaxPoints()
+    {
+        return _dataPointsGO.Count >= _maxNumberOfPoints;
     }
 
     private void CreateDotConnection(Vector2 posA, Vector2 posB)
@@ -301,7 +363,7 @@ public class PlotVsTime : MonoBehaviour
         }
 
         RectTransform connectionRect = pointConnectionGO.GetComponent<RectTransform>();
-        connectionRect.sizeDelta = new Vector2(distance, 2f);
+        connectionRect.sizeDelta = new Vector2(distance, 5f);
         connectionRect.anchorMin = Vector2.zero;
         connectionRect.anchorMax = Vector2.zero;
         connectionRect.anchoredPosition = posA + dir * distance * 0.5f;
@@ -316,7 +378,7 @@ public class PlotVsTime : MonoBehaviour
         Vector2 dir = (posB - posA).normalized;
 
         RectTransform connectionRect = connectionGO.GetComponent<RectTransform>();
-        connectionRect.sizeDelta = new Vector2(distance, 2f);
+        connectionRect.sizeDelta = new Vector2(distance, 5f);
         connectionRect.anchoredPosition = posA + dir * distance * 0.5f;
         connectionRect.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
     }
@@ -455,14 +517,6 @@ public class PlotVsTime : MonoBehaviour
 
         return textGO;
     }
-
-    //public void SetAxisPrecision(float precision, bool isVerticalAxis)
-    //{
-    //    if (isVerticalAxis)
-    //        YAxisPrecision = (int)precision;
-    //    else
-    //        XAxisPrecision = precision;
-    //}
 
     public void ChangePlotMode(int mode)
     {

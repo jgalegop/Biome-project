@@ -172,19 +172,25 @@ public class PlotHistogram : MonoBehaviour
         textTMPro.font = _tickFont;
         textTMPro.enableWordWrapping = false;
 
-        Debug.Log(val);
-        Debug.Log(val.ToString());
         if (val != (int)val)
             textTMPro.text = val.ToString("00.0");
         else
         {
-            if (val < 10)
+            if (isVerticalAxis)
+            {
                 textTMPro.text = val.ToString("0");
+            }
             else
-                textTMPro.text = val.ToString("00");
+            {
+                if (val < 10)
+                    textTMPro.text = val.ToString("0");
+                else
+                {
+                    Debug.Log("why does this not work :(");
+                    textTMPro.text = val.ToString("00");
+                }
+            }
         }
-            
-        Debug.Log(textTMPro.text);
 
         textGO.transform.SetParent(parent.transform);
 
