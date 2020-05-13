@@ -48,6 +48,7 @@ public class PlotVsTime : MonoBehaviour
     public float XAxisPrecision { get; private set; }
 
     private float _axisWidth = 5f;
+    private float _lineSize = 4f;
 
     private List<GameObject> _elementsParents = new List<GameObject>();
 
@@ -253,7 +254,7 @@ public class PlotVsTime : MonoBehaviour
             yVariable = _statsManager.PopulationInTime[time].averageSenseRadius;
 
         Vector2 point = new Vector2(_statsManager.PopulationInTime[time].time, yVariable);
-        pointRect.sizeDelta = new Vector2(5, 5);
+        pointRect.sizeDelta = new Vector2(_lineSize, _lineSize);
         pointRect.anchoredPosition = new Vector2(point.x / _maxTime * _plotWidth - 0.5f * _axisWidth, point.y / _maxYData * _plotHeight - 0.5f * _axisWidth);
         pointRect.anchorMin = Vector2.zero;
         pointRect.anchorMax = Vector2.zero;
@@ -363,7 +364,7 @@ public class PlotVsTime : MonoBehaviour
         }
 
         RectTransform connectionRect = pointConnectionGO.GetComponent<RectTransform>();
-        connectionRect.sizeDelta = new Vector2(distance, 5f);
+        connectionRect.sizeDelta = new Vector2(distance, _lineSize);
         connectionRect.anchorMin = Vector2.zero;
         connectionRect.anchorMax = Vector2.zero;
         connectionRect.anchoredPosition = posA + dir * distance * 0.5f;
@@ -378,7 +379,7 @@ public class PlotVsTime : MonoBehaviour
         Vector2 dir = (posB - posA).normalized;
 
         RectTransform connectionRect = connectionGO.GetComponent<RectTransform>();
-        connectionRect.sizeDelta = new Vector2(distance, 5f);
+        connectionRect.sizeDelta = new Vector2(distance, _lineSize);
         connectionRect.anchoredPosition = posA + dir * distance * 0.5f;
         connectionRect.localEulerAngles = new Vector3(0, 0, Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg);
     }

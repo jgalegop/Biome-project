@@ -24,6 +24,8 @@ public class PlotHistogram : MonoBehaviour
     [SerializeField]
     private Color _barColor = Color.white;
     [SerializeField]
+    private Color _hoverBarColor = Color.white;
+    [SerializeField]
     private Sprite _barImage = null;
 
     [Header ("Ticks and axes")]
@@ -92,7 +94,7 @@ public class PlotHistogram : MonoBehaviour
 
     private GameObject GetBar(int xVal, int yVal)
     {
-        GameObject barGO = new GameObject(_barName, typeof(Image), typeof(Canvas));
+        GameObject barGO = new GameObject(_barName, typeof(Image), typeof(Canvas), typeof(ChangeOnHover), typeof(ShowTooltip), typeof(GraphicRaycaster));
         SetElementParent(barGO);
         Image barImage = barGO.GetComponent<Image>();
         barImage.color = _barColor;
@@ -110,6 +112,9 @@ public class PlotHistogram : MonoBehaviour
         barRect.anchoredPosition = new Vector2(_plotWidth * xVal / (_dataStats.NumberOfBars + 1), 0);
         barRect.anchorMin = Vector2.zero;
         barRect.anchorMax = Vector2.zero;
+
+        barGO.GetComponent<ChangeOnHover>().SetHoverColor(_hoverBarColor);
+        barGO.GetComponent<ShowTooltip>().SetOptions(true, true);
 
         return barGO;
     }
@@ -248,6 +253,8 @@ public class PlotHistogram : MonoBehaviour
         RectTransform barRect = bar.GetComponent<RectTransform>();
         Vector2 newSizeDelta = new Vector2(_barWidth, _plotHeight * (float)yVal / (float)_dataStats.MaxYData);
         barRect.DOSizeDelta(newSizeDelta, 0.5f);
+        if (yVal > 0)
+            bar.GetComponent<ShowTooltip>().SetIntText(yVal);
     }
 
     private void UpdateYTicks()

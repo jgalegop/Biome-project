@@ -9,10 +9,25 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField]
     private Vector2 _tooltipPosition = Vector2.zero;
 
+    [SerializeField]
+    private bool _followPointerPosition = false;
+    [SerializeField]
+    private bool _useAltColor = false;
+
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (_useAltColor)
+            Tooltip.SetAlternativeColor();
+
         // this changes for different resolutions. Have that in mind
-        Tooltip.ShowTooltip(_tooltipText, _tooltipPosition);
+        if (_followPointerPosition)
+        {
+            Tooltip.ShowTooltip(_tooltipText);
+        }
+        else
+        {
+            Tooltip.ShowTooltip(_tooltipText, _tooltipPosition);
+        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
@@ -36,5 +51,11 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     {
         _tooltipText = text;
         Tooltip.UpdateText(_tooltipText);
+    }
+
+    public void SetOptions(bool followMouse, bool altColor)
+    {
+        _followPointerPosition = followMouse;
+        _useAltColor = altColor;
     }
 }
