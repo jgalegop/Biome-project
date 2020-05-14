@@ -10,6 +10,9 @@ public class PlantSpawner : MonoBehaviour, IDisplayableText
     [Range(0, 1)] private float _plantsPerSecond = 0.0f;
 
     [SerializeField]
+    private float _maxPlantsPerSecond = 5f;
+
+    [SerializeField]
     private LivingBeing _plantPrefab = null;
 
     [SerializeField]
@@ -22,6 +25,8 @@ public class PlantSpawner : MonoBehaviour, IDisplayableText
     private Vector3 _newWorldPos;
     private List<Coroutine> _runningCoroutines = new List<Coroutine>();
 
+    private StatisticsManager _statsManager = null;
+
     private void Start()
     {
         Init();
@@ -32,6 +37,10 @@ public class PlantSpawner : MonoBehaviour, IDisplayableText
         _grid = FindObjectOfType<PathfindGrid>();
         if (_grid == null)
             Debug.LogError("Scene needs a PathfindGrid object");
+
+        _statsManager = FindObjectOfType<StatisticsManager>();
+        if (_statsManager == null)
+            Debug.LogError("Scene needs a StatisticsManager object");
 
         Coroutine growingPlants = StartCoroutine(ChanceToGrowPlant());
         _runningCoroutines.Add(growingPlants);
@@ -44,14 +53,18 @@ public class PlantSpawner : MonoBehaviour, IDisplayableText
             float averagePlantTime = 1f / (_plantsPerSecond + Mathf.Epsilon);
             float nextPlantTime = Random.Range(0.8f * averagePlantTime, 1.2f * averagePlantTime);
             yield return new WaitForSeconds(nextPlantTime);
-            if (SuitablePositionFound())
-            {
-                LivingBeing newPlant = Instantiate(_plantPrefab, _newWorldPos, Quaternion.identity);
-                newPlant.transform.parent = transform;
-                Collider newPlantCollider = newPlant.GetComponent<Collider>();
-                newPlantCollider.enabled = false;
 
-                StartCoroutine(GrowPlant(newPlant, newPlantCollider));
+            if (_statsManager.CanCreatePlants())
+            {
+                if (SuitablePositionFound())
+                {
+                    LivingBeing newPlant = Instantiate(_plantPrefab, _newWorldPos, Quaternion.identity);
+                    newPlant.transform.parent = transform;
+                    Collider newPlantCollider = newPlant.GetComponent<Collider>();
+                    newPlantCollider.enabled = false;
+
+                    StartCoroutine(GrowPlant(newPlant, newPlantCollider));
+                }
             }
         }
     }
@@ -96,7 +109,7 @@ public class PlantSpawner : MonoBehaviour, IDisplayableText
 
     public void SetPlantsPerSecond(float pps)
     {
-        _plantsPerSecond = Mathf.Clamp(pps, 0f, 2f);
+        _plantsPerSecond = Mathf.Clamp(pps, 0f, _maxPlantsPerSecond);
         StopPlantSpawning();
         Coroutine growingPlants = StartCoroutine(ChanceToGrowPlant());
         _runningCoroutines.Add(growingPlants);

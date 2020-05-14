@@ -2473,7 +2473,7 @@ GameObject:
   - component: {fileID: 645393282}
   - component: {fileID: 645393283}
   m_Layer: 0
-  m_Name: TimeStatistics
+  m_Name: Statistics
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2506,6 +2506,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   DataTimeInterval: 5
+  MaxNumberOfPlants: 200
   TimeStamps: []
 --- !u!1 &656343342
 GameObject:

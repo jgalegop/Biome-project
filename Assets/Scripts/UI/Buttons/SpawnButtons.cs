@@ -69,6 +69,11 @@ public class SpawnButtons : MonoBehaviour
                 {
                     _grid.StartPathfindGrid();
                 }
+
+                if (!_statisticsManager.CanCreatePlants())
+                {
+                    _statisticsManager.MaxNumberOfPlants++;
+                }
             }
             else
             {

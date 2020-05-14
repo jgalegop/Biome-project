@@ -17,6 +17,9 @@ public class StatisticsManager : MonoBehaviour
     public float DataTimeInterval = 10f;
     private bool _firstAnimalIsBorn = false;
 
+    public int MaxNumberOfPlants = 250;
+    private int _plantsNumber = 0;
+
     public List<float> TimeStamps = new List<float>();
     public Dictionary<float, DataPoint> PopulationInTime = new Dictionary<float, DataPoint>();
 
@@ -101,6 +104,21 @@ public class StatisticsManager : MonoBehaviour
         Debug.Log("new max speed is set");
         MaxSpeed = newSpeed;
         OnMaxSpeedChanged?.Invoke(newSpeed);
+    }
+
+    public static void PlantCreated()
+    {
+        instance._plantsNumber++;
+    }
+
+    public static void PlantDestroyed()
+    {
+        instance._plantsNumber--;
+    }
+
+    public bool CanCreatePlants()
+    {
+        return _plantsNumber < MaxNumberOfPlants;
     }
 }
 

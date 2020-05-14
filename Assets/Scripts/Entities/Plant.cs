@@ -21,6 +21,18 @@ namespace Entities
                 Die();
             }
         }
+
+        public override void Spawn()
+        {
+            base.Spawn();
+            StatisticsManager.PlantCreated();
+        }
+
+        public override void Die()
+        {
+            base.Die();
+            StatisticsManager.PlantDestroyed();
+        }
     }
 }
 
