@@ -14,8 +14,11 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     [SerializeField]
     private bool _useAltColor = false;
 
+    private bool _pointerInObject = false;
+
     public void OnPointerEnter(PointerEventData eventData)
     {
+        _pointerInObject = true;
         if (_useAltColor)
             Tooltip.SetAlternativeColor();
 
@@ -32,6 +35,7 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        _pointerInObject = false;
         Tooltip.HideTooltip();
     }
 
@@ -41,16 +45,24 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         Tooltip.UpdateText(_tooltipText);
     }
 
+    public void UpdateText()
+    {
+        if (_pointerInObject)
+        {
+            Tooltip.UpdateText(_tooltipText);
+        }
+    }
+
     public void SetIntText(float number)
     {
         _tooltipText = ((int)number).ToString();
-        Tooltip.UpdateText(_tooltipText);
+        UpdateText();
     }
 
     public void SetCustomText(string text)
     {
         _tooltipText = text;
-        Tooltip.UpdateText(_tooltipText);
+        UpdateText();
     }
 
     public void SetOptions(bool followMouse, bool altColor)
