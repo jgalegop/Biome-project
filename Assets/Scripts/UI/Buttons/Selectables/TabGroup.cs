@@ -13,6 +13,8 @@ public class TabGroup : MonoBehaviour
     private Color _hoverColor = Color.white;
     [SerializeField]
     private Color _selectedColor = Color.white;
+    [SerializeField]
+    private Color _disabledColor = Color.white;
 
     [SerializeField]
     private Color _spriteDefaultColor = Color.white;
@@ -20,6 +22,8 @@ public class TabGroup : MonoBehaviour
     private Color _spriteHoverColor = Color.white;
     [SerializeField]
     private Color _spriteSelectedColor = Color.white;
+    [SerializeField]
+    private Color _spriteDisabledColor = Color.white;
 
     [SerializeField]
     private List<GameObject> _tabMenus = null;
@@ -81,7 +85,7 @@ public class TabGroup : MonoBehaviour
     {
         foreach (TabButton tab in _tabButtons)
         {
-            if (_selectedTab != null && _selectedTab == tab) { continue; }
+            if (_selectedTab != null && _selectedTab == tab || tab.IsDisabled) { continue; }
             tab.TabImage.color = _idleColor;
             tab.ChangeInImageColor(_spriteDefaultColor);
         }

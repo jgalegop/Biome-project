@@ -5,6 +5,7 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
 {
     [SerializeField]
     private string _tooltipText = "Example tooltip text";
+    private string _defaultTooltipText;
 
     [SerializeField]
     private Vector2 _tooltipPosition = Vector2.zero;
@@ -15,6 +16,11 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private bool _useAltColor = false;
 
     private bool _pointerInObject = false;
+
+    private void Start()
+    {
+        _defaultTooltipText = _tooltipText;
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
@@ -62,6 +68,18 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     public void SetCustomText(string text)
     {
         _tooltipText = text;
+        UpdateText();
+    }
+
+    public void AddDisabledText()
+    {
+        _tooltipText += " (disabled)";
+        UpdateText();
+    }
+
+    public void RemoveDisabledText()
+    {
+        _tooltipText = _defaultTooltipText;
         UpdateText();
     }
 

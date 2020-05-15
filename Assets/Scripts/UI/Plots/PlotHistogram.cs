@@ -326,16 +326,6 @@ public class PlotHistogram : MonoBehaviour
         }
     }
 
-
-
-    //public void SetAxisPrecision(float precision, bool isVerticalAxis)
-    //{
-    //    if (isVerticalAxis)
-    //        _yAxisPrecision = (int)precision;
-    //    else
-    //        _xAxisPrecision = precision;
-    //}
-
     private void CreatePlotElementParents()
     {
         var parentNames = new List<string> { _barName + "s", _tickName + "s" };

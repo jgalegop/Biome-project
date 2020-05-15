@@ -25,7 +25,7 @@ public class StatisticsManager : MonoBehaviour
 
     public List<AnimalData> RabbitData = new List<AnimalData>();
 
-
+    public static event Action OnFirstLivingBeingCreated = delegate { };
 
     public float MaxSpeed { get; private set; }
     public static event Action<float> OnMaxSpeedChanged = delegate { };
@@ -66,10 +66,12 @@ public class StatisticsManager : MonoBehaviour
 
     public static void AnimalIsBorn(Animal animal)
     {
+        if (instance.RabbitData.Count == 0 && instance._plantsNumber == 0)
+            OnFirstLivingBeingCreated?.Invoke();
+
         AnimalData aData = new AnimalData(animal.GetAdultMoveSpeed(), animal.GetSenseRadius());
         instance.RabbitData.Add(aData);
         OnAnimalNumberIncreased?.Invoke(aData);
-        
 
         if (!instance._firstAnimalIsBorn)
         {
@@ -108,6 +110,9 @@ public class StatisticsManager : MonoBehaviour
 
     public static void PlantCreated()
     {
+        if (instance._plantsNumber == 0 && instance.RabbitData.Count == 0)
+            OnFirstLivingBeingCreated?.Invoke();
+
         instance._plantsNumber++;
     }
 

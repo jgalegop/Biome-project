@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 using System.Collections.Generic;
 using Entities;
 
@@ -19,9 +20,12 @@ public class SpawnButtons : MonoBehaviour
     private float _spawnHeight;
 
     private bool _spawnedAnimal = false;
+    private bool _spawnedTree = false;
 
     [SerializeField]
     private StatisticsManager _statisticsManager = null;
+
+    public event Action OnFirstTreeCreated = delegate { };
 
     private void Awake()
     {
@@ -40,6 +44,12 @@ public class SpawnButtons : MonoBehaviour
         {
             _spawnedAnimal = true;
             _statisticsManager.gameObject.SetActive(true);
+        }
+
+        if (prefab.GetComponent<TreeObstacle>() != null && !_spawnedTree)
+        {
+            _spawnedTree = true;
+            OnFirstTreeCreated?.Invoke();
         }
 
         _spawnHeight = _mapGen.DefaultHeight;
@@ -87,8 +97,8 @@ public class SpawnButtons : MonoBehaviour
     {
         for (int i = 0; i < _findPosTries; i++)
         {
-            float newX = Random.Range(-0.5f * _grid.GridWorldSize.x, +0.5f * _grid.GridWorldSize.x);
-            float newY = Random.Range(-0.5f * _grid.GridWorldSize.y, +0.5f * _grid.GridWorldSize.y);
+            float newX = UnityEngine.Random.Range(-0.5f * _grid.GridWorldSize.x, +0.5f * _grid.GridWorldSize.x);
+            float newY = UnityEngine.Random.Range(-0.5f * _grid.GridWorldSize.y, +0.5f * _grid.GridWorldSize.y);
             _newWorldPos = new Vector3(newX, _spawnHeight, newY);
 
             if (_grid.NodeFromWorldInput(_newWorldPos).Walkable &&
@@ -127,5 +137,10 @@ public class SpawnButtons : MonoBehaviour
     public void SetSpawnNumber(int number)
     {
         _spawnNumber = number;
+    }
+
+    public void FirstTreeSpawned()
+    {
+
     }
 }

@@ -8,6 +8,11 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
     [SerializeField]
     private TabGroup _tabGroup = null;
 
+    [SerializeField]
+    private Color _disabledColor = Color.white;
+    [SerializeField]
+    private Color _spriteDisabledColor = Color.white;
+
     public Image TabImage { get; private set; }
     public Image InteriorImage { get; private set; }
 
@@ -20,6 +25,11 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
     private bool _isSelected = false;
     private Vector3 _defaultImageSize;
 
+    public bool IsDisabled { get; private set; }
+
+    private OnConditionDisabler _disabler = null;
+    private ShowTooltip _showTooltip = null;
+
     private void Start()
     {
         TabImage = GetComponent<Image>();
@@ -29,20 +39,37 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
 
         if (_startsSelected)
             _tabGroup.OnTabSelected(this);
+
+        _disabler = GetComponent<OnConditionDisabler>();
+        if (_disabler != null)
+            _disabler.OnDisableCondition += DisableButton;
+
+        _showTooltip = GetComponent<ShowTooltip>();
+    }
+
+    private void OnDestroy()
+    {
+        if (_disabler != null)
+            _disabler.OnDisableCondition -= DisableButton;
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        _tabGroup.OnTabEnter(this);
+        if (!IsDisabled)
+            _tabGroup.OnTabEnter(this);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        _tabGroup.OnTabExit(this);
+        if (!IsDisabled)
+            _tabGroup.OnTabExit(this);
     }
 
     public void OnPointerClick(PointerEventData eventData)
     {
+        if (IsDisabled)
+            return;
+
         if (!_isSelected)
         {
             _tabGroup.OnTabSelected(this);
@@ -68,5 +95,26 @@ public class TabButton : MonoBehaviour, IPointerClickHandler, IPointerEnterHandl
     public void ChangeInImageColor(Color color)
     {
         InteriorImage.color = color;
+    }
+
+    public void DisableButton()
+    {
+        if (!IsDisabled)
+        {
+            IsDisabled = true;
+            TabImage.color = _disabledColor;
+            InteriorImage.color = _spriteDisabledColor;
+            if (_showTooltip != null)
+            {
+                _showTooltip.AddDisabledText();
+            }
+        }
+    }
+
+    public void ReenableButton()
+    {
+        //IsDisabled = false;
+        //TabImage.color = _idleColor;
+        //InteriorImage.color = _innerImageIdleColor;
     }
 }
