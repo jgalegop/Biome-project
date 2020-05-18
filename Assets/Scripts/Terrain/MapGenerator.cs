@@ -165,7 +165,11 @@ public class MapGenerator : MonoBehaviour
 
     public void SetWaterLevel(float waterHeight)
     {
-        float referenceHeightDiff = 1f - waterHeight;
+        if (waterHeight > 0.99f)
+            waterHeight = 1.01f;
+        else if (waterHeight < 0.01)
+            waterHeight = -0.01f;
+
         for (int i = 0; i < _regions.Length; i++)
         {
             _regions[i].height = waterHeight + (1f - waterHeight) * _relativeRegionHeights[i];
