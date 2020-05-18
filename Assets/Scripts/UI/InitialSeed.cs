@@ -6,7 +6,7 @@ public class InitialSeed : MonoBehaviour
     [SerializeField]
     private MapGenerator _mapGen = null;
 
-    private void Awake()
+    private void Start()
     {
         TMP_InputField inputField = GetComponent<TMP_InputField>();
         if (_mapGen != null && inputField != null)

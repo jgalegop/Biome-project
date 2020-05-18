@@ -42,6 +42,8 @@ public class MapGenerator : MonoBehaviour
 
     [SerializeField]
     private TerrainType[] _regions = null;
+    private float[] _relativeRegionHeights;
+    private float[] _defaultRegionHeights;
 
     public float DefaultHeight { get; private set; }
 
@@ -50,6 +52,7 @@ public class MapGenerator : MonoBehaviour
         DefaultHeight = 1f;
         _seed = Random.Range(0, 99999999);
         GenerateMap();
+        SetRelativeRegionHeights();
     }
 
     public void GenerateMap()
@@ -113,6 +116,16 @@ public class MapGenerator : MonoBehaviour
             _octaves = 0;
     }
 
+    private void SetRelativeRegionHeights()
+    {
+        _relativeRegionHeights = new float[_regions.Length];
+        _defaultRegionHeights = new float[_regions.Length];
+        for (int i = 0; i < _regions.Length; i++)
+        {
+            _relativeRegionHeights[i] = (_regions[i].height - _regions[0].height) / (_regions[_regions.Length - 1].height - _regions[0].height);
+            _defaultRegionHeights[i] = _regions[i].height;
+        }
+    }
 
     public void SetWidth(float width)
     {
@@ -148,6 +161,16 @@ public class MapGenerator : MonoBehaviour
     {
         _octaves = (int) complexity;
         GenerateMap();
+    }
+
+    public void SetWaterLevel(float waterHeight)
+    {
+        float referenceHeightDiff = 1f - waterHeight;
+        for (int i = 0; i < _regions.Length; i++)
+        {
+            _regions[i].height = waterHeight + (1f - waterHeight) * _relativeRegionHeights[i];
+            GenerateMap();
+        }
     }
 
     public void SetXOffset(float xOffset)
