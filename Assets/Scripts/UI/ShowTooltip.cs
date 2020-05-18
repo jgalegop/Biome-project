@@ -14,6 +14,8 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
     private bool _followPointerPosition = false;
     [SerializeField]
     private bool _useAltColor = false;
+    [SerializeField]
+    private bool _warning = false;
 
     private bool _pointerInObject = false;
 
@@ -27,6 +29,8 @@ public class ShowTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHand
         _pointerInObject = true;
         if (_useAltColor)
             Tooltip.SetAlternativeColor();
+        if (_warning)
+            Tooltip.SetWarningColor();
 
         // this changes for different resolutions. Have that in mind
         if (_followPointerPosition)

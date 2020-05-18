@@ -14,6 +14,8 @@ public class Tooltip : MonoBehaviour
     private Color _defaultColor = Color.white;
     [SerializeField]
     private Color _alternativeColor = Color.white;
+    [SerializeField]
+    private Color _warningColor = Color.white;
 
     [SerializeField]
     private float _textPadding = 8f;
@@ -65,6 +67,10 @@ public class Tooltip : MonoBehaviour
     public static void SetAlternativeColor()
     {
         instance._bgImage.color = instance._alternativeColor;
+    }
+    public static void SetWarningColor()
+    {
+        instance._bgImage.color = instance._warningColor;
     }
 
     public static void HideTooltip()

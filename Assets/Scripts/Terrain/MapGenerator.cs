@@ -48,6 +48,7 @@ public class MapGenerator : MonoBehaviour
     private void Awake()
     {
         DefaultHeight = 1f;
+        _seed = Random.Range(0, 99999999);
         GenerateMap();
     }
 
@@ -159,6 +160,11 @@ public class MapGenerator : MonoBehaviour
     {
         _offset += Vector2.up * (yOffset - _offset.y);
         GenerateMap();
+    }
+
+    public int GetSeed()
+    {
+        return _seed;
     }
 }
 
