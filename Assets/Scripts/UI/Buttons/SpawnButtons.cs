@@ -8,9 +8,13 @@ public class SpawnButtons : MonoBehaviour
     [SerializeField]
     private int _spawnNumber = 1;
 
+    [SerializeField]
+    private NoLandWarning _noLandWarning = null;
+
     private PathfindGrid _grid = null;
 
     private int _findPosTries = 10;
+    private int _maxNumberOfFailedPlacements = 50;
     private Vector3 _newWorldPos = Vector3.zero;
 
     private List<GameObject> _spawnedPrefabs = new List<GameObject>();
@@ -68,7 +72,8 @@ public class SpawnButtons : MonoBehaviour
             Debug.LogError("Parent still null");
 
         int k = 0;
-        while (k < _spawnNumber)
+        int j = 0;
+        while (k < _spawnNumber && j < _maxNumberOfFailedPlacements)
         {
             if (SuitablePositionFound())
             {
@@ -88,6 +93,8 @@ public class SpawnButtons : MonoBehaviour
             else
             {
                 Debug.Log("No suitable position found!");
+                _noLandWarning.gameObject.SetActive(true);
+                j++;
             }
         }
         

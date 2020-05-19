@@ -91,6 +91,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnNumber: 1
+  _noLandWarning: {fileID: 0}
   _statisticsManager: {fileID: 0}
 --- !u!114 &1552692258766973957
 MonoBehaviour:
@@ -418,6 +419,7 @@ MonoBehaviour:
   _tooltipPosition: {x: -300, y: 269.5}
   _followPointerPosition: 0
   _useAltColor: 0
+  _warning: 0
 --- !u!1 &1552692258947913235
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,6 +510,7 @@ MonoBehaviour:
   _tooltipPosition: {x: -300, y: 269.5}
   _followPointerPosition: 0
   _useAltColor: 0
+  _warning: 0
 --- !u!1 &1552692259035717442
 GameObject:
   m_ObjectHideFlags: 0
@@ -1161,6 +1164,7 @@ MonoBehaviour:
   _tooltipPosition: {x: -300, y: 269.5}
   _followPointerPosition: 0
   _useAltColor: 0
+  _warning: 0
 --- !u!114 &490804139
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1369,6 +1373,7 @@ MonoBehaviour:
   _tooltipPosition: {x: -300, y: 269.5}
   _followPointerPosition: 0
   _useAltColor: 0
+  _warning: 0
 --- !u!1 &1552692259915056765
 GameObject:
   m_ObjectHideFlags: 0
@@ -1511,6 +1516,7 @@ MonoBehaviour:
   _tooltipPosition: {x: -300, y: 269.5}
   _followPointerPosition: 0
   _useAltColor: 0
+  _warning: 0
 --- !u!1 &1552692259989939714
 GameObject:
   m_ObjectHideFlags: 0
@@ -1634,6 +1640,7 @@ MonoBehaviour:
   _tooltipPosition: {x: -300, y: 269.5}
   _followPointerPosition: 0
   _useAltColor: 0
+  _warning: 0
 --- !u!1 &1552692260010307172
 GameObject:
   m_ObjectHideFlags: 0
@@ -1981,6 +1988,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spawnNumber: 1
+  _noLandWarning: {fileID: 0}
   _statisticsManager: {fileID: 0}
 --- !u!114 &1552692260407476021
 MonoBehaviour:
