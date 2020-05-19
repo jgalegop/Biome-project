@@ -147,8 +147,15 @@ public class MapGenerator : MonoBehaviour
 
     public void SetSeed(string seed)
     {
-        _seed = int.Parse(seed);
-        GenerateMap();
+        if (seed != "-")
+        {
+            if (seed == string.Empty)
+                _seed = 0;
+            else
+                _seed = (int)double.Parse(seed);
+
+            GenerateMap();
+        }
     }
 
     public void SetScale(float scale)

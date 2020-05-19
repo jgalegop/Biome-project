@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using System.Globalization;
 
 [RequireComponent(typeof(TMP_InputField))]
 public class InputFieldController : MonoBehaviour
@@ -30,9 +31,16 @@ public class InputFieldController : MonoBehaviour
         else
         {
             if (_inputField.text == string.Empty)
+            {
                 _slider.value = 0;
+            }
             else
-                _slider.value = float.Parse(_inputField.text);
+            {
+                if (_inputField.text != "-")
+                {
+                    _slider.value = float.Parse(_inputField.text);
+                }
+            }     
         }
     }
 
