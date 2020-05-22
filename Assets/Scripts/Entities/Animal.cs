@@ -36,6 +36,7 @@ namespace Entities
         public LivingBeing TargetFood { get; private set; }
         public LivingBeing FoodIgnored { get; private set; }
         public Animal TargetMate { get; private set; }
+        public Animal TargetPredator { get; private set; }
 
         public event Action OnAnimalDeath = delegate { };
         public event Action OnAnimalWithReproductiveUrge = delegate { };
@@ -91,7 +92,8 @@ namespace Entities
                 {typeof(ChasingFood), new ChasingFood(this) },
                 {typeof(Eating), new Eating(this) },
                 {typeof(GoingForMate), new GoingForMate(this) },
-                {typeof(Mating), new Mating(this) }
+                {typeof(Mating), new Mating(this) },
+                {typeof(Fleeing), new Fleeing(this) }
             };
 
             FSM.SetStates(states);
@@ -178,6 +180,10 @@ namespace Entities
             TargetMate = mate;
         }
 
+        public void SetTargetPredator(Animal predator)
+        {
+            TargetPredator = predator;
+        }
 
         public bool IsAdult()
         {
@@ -304,6 +310,7 @@ namespace Entities
             if (senseRadius < 0)
                 senseRadius = 0;
         }
+
 
         public void SetFoodIgnored(LivingBeing lb)
         {

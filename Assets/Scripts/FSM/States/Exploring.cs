@@ -33,6 +33,13 @@ public class Exploring : State
         _rayDistance = _animal.GetSenseRadius();
         _animal.ModifyEnergy(-_animal.GetEnergyLostPerTick());
 
+        var nearbyPredator = NearbyPredator();
+        if (nearbyPredator != null)
+        {
+            _animal.SetTargetPredator(nearbyPredator);
+            return typeof(Fleeing);
+        }
+
         if (_animal.IsHungry())
         {
             var foodTarget = NearbyFood();
@@ -201,6 +208,40 @@ public class Exploring : State
         }
 
         return closestMate;
+    }
+
+    private Animal NearbyPredator()
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _animal.GetSenseRadius());
+
+        // filter all with same diet as this animal specie type
+        Collider[] nearbySpecieColliders =
+            Array.FindAll(nearbyColliders, c => c.gameObject.GetComponent<Animal>()?.GetDiet() == _animal.GetType());
+        Animal[] potentialPredators =
+            Array.ConvertAll(nearbySpecieColliders, c => c.gameObject.GetComponent<Animal>());
+
+        // check which ones are chasing
+        Animal closestPredator = null;
+        float smallestDist = _animal.GetSenseRadius() + 1;
+        foreach (Animal a in potentialPredators)
+        {
+            // if predator is chasing this animal
+            if (a.GetState() == typeof(ChasingFood))
+            {
+                if (a.TargetFood.gameObject == _animal.gameObject)
+                {
+                    float dist = Vector3.Distance(transform.position, a.transform.position);
+                    if (dist < smallestDist &&
+                        dist > Mathf.Epsilon)
+                    {
+                        closestPredator = a;
+                        smallestDist = dist;
+                    }
+                }
+            }
+        }
+
+        return closestPredator;
     }
 
 
