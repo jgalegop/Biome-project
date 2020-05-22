@@ -13,6 +13,9 @@ public class AnimalPanel : MonoBehaviour
     private TMP_Text _energyText = null;
 
     [SerializeField]
+    private TMP_Text _animalText = null;
+
+    [SerializeField]
     private TMP_Text _moveSpeedNumber = null;
 
     [SerializeField]
@@ -82,6 +85,10 @@ public class AnimalPanel : MonoBehaviour
             _panelImage.transform.DOScale(Vector3.one, 0.4f)
                                  .SetEase(Ease.OutBack)
                                  .SetUpdate(true);
+            _animalGraphic.GetChild(0).transform.localRotation= _boundAnimal.transform.GetChild(0).transform.localRotation;
+            _animalGraphic.GetChild(0).transform.localScale = 0.75f * _boundAnimal.transform.GetChild(0).transform.localScale;
+            _animalGraphic.GetComponentInChildren<MeshFilter>().mesh = _boundAnimal.GetComponentInChildren<MeshFilter>().mesh;
+            _animalGraphic.GetComponentInChildren<MeshRenderer>().material = _boundAnimal.GetComponentInChildren<MeshRenderer>().material;
             _animalGraphic.GetComponentInChildren<MeshRenderer>().material.color = _boundAnimal.GetComponentInChildren<MeshRenderer>().material.color;
         }
         else
@@ -101,6 +108,7 @@ public class AnimalPanel : MonoBehaviour
 
     private void DisplayStats()
     {
+        _animalText.SetText(_boundAnimal.GetSpecieText().ToString());
         _moveSpeedNumber.SetText(_boundAnimal.GetMoveSpeed().ToString("F1") + " m/s");
         _senseRadiusNumber.SetText(_boundAnimal.GetSenseRadius().ToString("F1") + " m");
         _dietText.SetText(_boundAnimal.GetDietText());

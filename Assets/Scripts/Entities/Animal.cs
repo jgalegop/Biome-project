@@ -238,6 +238,12 @@ namespace Entities
             return subTypes[subTypes.Length - 1];
         }
 
+        public string GetSpecieText()
+        {
+            String[] subTypes = this.GetType().ToString().Split('.');
+            return subTypes[subTypes.Length - 1];
+        }
+
 
         private int _tickOfDeath = 0;
 

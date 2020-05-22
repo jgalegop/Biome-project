@@ -7,7 +7,7 @@ namespace Entities
     public class Fox : Animal
     {
         // traits
-        private float _moveSpeed = 2f;
+        private float _moveSpeed = 2.5f;
         private float _senseRadius = 10f;
 
         // diet

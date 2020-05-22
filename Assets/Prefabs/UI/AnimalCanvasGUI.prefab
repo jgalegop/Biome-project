@@ -1931,6 +1931,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _energyBar: {fileID: 7372815971446839051}
   _energyText: {fileID: 7372815972378616126}
+  _animalText: {fileID: 7372815971012085674}
   _moveSpeedNumber: {fileID: 7372815972676961391}
   _senseRadiusNumber: {fileID: 7372815970938813313}
   _dietText: {fileID: 7372815971283442073}
@@ -1948,6 +1949,12 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5975056690787464250}
     m_Modifications:
+    - target: {fileID: -5178661895559278292, guid: 27de30de9a4ab2f48b45622793e88960,
+        type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 2212009239438826721, guid: 279b16d07a6cde54e9abc4cc5d000ece,
+        type: 3}
     - target: {fileID: -4216859302048453862, guid: 27de30de9a4ab2f48b45622793e88960,
         type: 3}
       propertyPath: m_LocalPosition.x
