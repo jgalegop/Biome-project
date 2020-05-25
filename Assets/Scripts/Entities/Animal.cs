@@ -15,7 +15,7 @@ namespace Entities
     public abstract class Animal : LivingBeing
     {
         protected float moveSpeed;
-        private float _adultMoveSpeed;
+        protected float adultMoveSpeed;
         protected float senseRadius;
         protected Type diet;
 
@@ -62,7 +62,7 @@ namespace Entities
 
             _energy = MaxEnergy;
 
-            _adultMoveSpeed = moveSpeed;
+            adultMoveSpeed = moveSpeed;
 
             AdultScale = Vector3.one;
             YoungScale = 0.5f * AdultScale;
@@ -121,6 +121,11 @@ namespace Entities
         public virtual void MoveTick(Vector3 destination)
         {
             transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+        }
+
+        public virtual void MoveTick(Vector3 destination, float speedModifier)
+        {
+            transform.Translate(Vector3.forward * speedModifier * moveSpeed * Time.deltaTime);
         }
 
 
@@ -196,13 +201,13 @@ namespace Entities
         //  -----  GET TRAITS  -----  
         public float GetMoveSpeed() { return moveSpeed; }
 
-        public float GetAdultMoveSpeed() { return _adultMoveSpeed; }
+        public float GetAdultMoveSpeed() { return adultMoveSpeed; }
 
         public float GetSenseRadius() { return senseRadius; }
 
         public Type GetDiet() { return diet; }
 
-        public float GetEnergyLostPerTick() { return 1 + 0.5f * moveSpeed * moveSpeed + 0.2f * senseRadius; }
+        public float GetEnergyLostPerTick() { return 0.5f * (1 + 0.5f * moveSpeed * moveSpeed + 0.2f * senseRadius); }
 
 
         public Type GetState()
@@ -261,7 +266,7 @@ namespace Entities
             transform.localScale = YoungScale;
             transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
 
-            moveSpeed = 0.5f * _adultMoveSpeed;
+            moveSpeed = 0.5f * adultMoveSpeed;
             StartCoroutine(GrowIntoAdult());
         }
 
@@ -279,20 +284,20 @@ namespace Entities
             {
                 transform.localScale = AdultScale;
                 transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
-                moveSpeed = _adultMoveSpeed;
+                moveSpeed = adultMoveSpeed;
             }
             OnAnimalGrowToAdult?.Invoke();
             StartReproductiveUrge();
         }
 
-        public void SpawnOffspring()
+        public virtual void SpawnOffspring()
         {
             for (int i = 0; i < UnityEngine.Random.Range(1,4); i++)
             {
                 Animal newAnimal = AnimalSpawner.GetNewInstance().GetComponent<Animal>();
 
                 newAnimal.SetTraits(moveSpeed, senseRadius); //overwrite awake SetTraits
-                _adultMoveSpeed = moveSpeed;
+                adultMoveSpeed = moveSpeed;
 
                 newAnimal.AnimalIsYoung();
                 newAnimal.transform.position += Vector3.forward * UnityEngine.Random.Range(-1f, 1f) +
@@ -310,7 +315,7 @@ namespace Entities
             moveSpeed = ms + UnityEngine.Random.Range(-_moveSpeedVar, _moveSpeedVar);
             if (moveSpeed < 0)
                 moveSpeed = 0;
-            _adultMoveSpeed = moveSpeed;
+            adultMoveSpeed = moveSpeed;
 
             senseRadius = sr + UnityEngine.Random.Range(-_senseRadiusVar, _senseRadiusVar);
             if (senseRadius < 0)

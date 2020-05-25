@@ -228,14 +228,17 @@ public class Exploring : State
             // if predator is chasing this animal
             if (a.GetState() == typeof(ChasingFood))
             {
-                if (a.TargetFood.gameObject == _animal.gameObject)
+                if (a != null && a.TargetFood != null)
                 {
-                    float dist = Vector3.Distance(transform.position, a.transform.position);
-                    if (dist < smallestDist &&
-                        dist > Mathf.Epsilon)
+                    if (a.TargetFood.gameObject == _animal.gameObject)
                     {
-                        closestPredator = a;
-                        smallestDist = dist;
+                        float dist = Vector3.Distance(transform.position, a.transform.position);
+                        if (dist < smallestDist &&
+                            dist > Mathf.Epsilon)
+                        {
+                            closestPredator = a;
+                            smallestDist = dist;
+                        }
                     }
                 }
             }

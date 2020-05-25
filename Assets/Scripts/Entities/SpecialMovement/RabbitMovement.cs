@@ -68,6 +68,20 @@ public class RabbitMovement : MonoBehaviour
         }
     }
 
+    private void Move(Vector3 destination, float speedModifier)
+    {
+        if (Vector3.Distance(transform.position, destination) >= _jumpLength)
+        {
+            if (_isJumping)
+                return;
+            Jump();
+        }
+        else
+        {
+            transform.Translate(Vector3.forward * speedModifier * _moveSpeed * Time.deltaTime);
+        }
+    }
+
     public void SetDefaultScale(Vector3 startingScale)
     {
         _startingScale = startingScale;

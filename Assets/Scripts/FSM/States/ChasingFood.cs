@@ -38,6 +38,13 @@ public class ChasingFood : State
     {
         _animal.ModifyEnergy(-_energyLost);
 
+        var nearbyPredator = NearbyPredator();
+        if (nearbyPredator != null)
+        {
+            _animal.SetTargetPredator(nearbyPredator);
+            return typeof(Fleeing);
+        }
+
         if (_animal.TargetFood == null || _animal.TargetFood == _animal.FoodIgnored)
         {
             _pathToTargetFood = new Vector3[0];
@@ -94,12 +101,15 @@ public class ChasingFood : State
         {
             _currentWaypoint = _animal.TargetFood.transform.position;
             // waypoint correction to y-pos
-            _currentWaypoint += Vector3.up * (1f - _currentWaypoint.y); // ANIMAL PLANE
+            _currentWaypoint += Vector3.up * (_animal.GroundYPos + 0.5f * _animal.transform.localScale.y - _currentWaypoint.y); // ANIMAL PLANE
         }
 
         // movement
         SetUpRotations();
-        _animal.MoveTick(_currentWaypoint);
+        if (_animal.TargetFood.GetComponent<Animal>() == null)
+            _animal.MoveTick(_currentWaypoint);
+        else
+            _animal.MoveTick(_currentWaypoint, 1.5f);
 
         float newDist = Vector3.Distance(transform.position, _animal.TargetFood.transform.position);
         if (newDist < interactionDistance)
@@ -129,11 +139,45 @@ public class ChasingFood : State
             {
                 _animal.SetFoodIgnored(_animal.TargetFood);
                 _animal.SetTargetFood(null);
-
-                //_animal.DebugChangeColor();
-                //Debug.LogError("food ignored");
             }   
         }
+    }
+
+    private Animal NearbyPredator()
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _animal.GetSenseRadius());
+
+        // filter all with same diet as this animal specie type
+        Collider[] nearbySpecieColliders =
+            Array.FindAll(nearbyColliders, c => c.gameObject.GetComponent<Animal>()?.GetDiet() == _animal.GetType());
+        Animal[] potentialPredators =
+            Array.ConvertAll(nearbySpecieColliders, c => c.gameObject.GetComponent<Animal>());
+
+        // check which ones are chasing
+        Animal closestPredator = null;
+        float smallestDist = _animal.GetSenseRadius() + 1;
+        foreach (Animal a in potentialPredators)
+        {
+            // if predator is chasing this animal
+            if (a.GetState() == typeof(ChasingFood))
+            {
+                if (a != null && a.TargetFood != null)
+                {
+                    if (a.TargetFood.gameObject == _animal.gameObject)
+                    {
+                        float dist = Vector3.Distance(transform.position, a.transform.position);
+                        if (dist < smallestDist &&
+                            dist > Mathf.Epsilon)
+                        {
+                            closestPredator = a;
+                            smallestDist = dist;
+                        }
+                    }
+                }
+            }
+        }
+
+        return closestPredator;
     }
 
     private bool IsPathBlocked(Vector3 dir, float dist)

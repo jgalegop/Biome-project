@@ -11,7 +11,7 @@ public class GoingForMate : State
     private Vector3 _targetMateDirection;
     private float _turnSpeed = 3f;
 
-    private readonly float interactionDistance = 2f;
+    private readonly float interactionDistance = 3f;
 
     private float _energyLost;
 
@@ -39,6 +39,13 @@ public class GoingForMate : State
     public override Type Tick()
     {
         _animal.ModifyEnergy(-_energyLost);
+
+        var nearbyPredator = NearbyPredator();
+        if (nearbyPredator != null)
+        {
+            _animal.SetTargetPredator(nearbyPredator);
+            return typeof(Fleeing);
+        }
 
         if (TargetNotSuitable())
         {
@@ -115,6 +122,43 @@ public class GoingForMate : State
         }
 
         return null;
+    }
+
+    private Animal NearbyPredator()
+    {
+        Collider[] nearbyColliders = Physics.OverlapSphere(transform.position, _animal.GetSenseRadius());
+
+        // filter all with same diet as this animal specie type
+        Collider[] nearbySpecieColliders =
+            Array.FindAll(nearbyColliders, c => c.gameObject.GetComponent<Animal>()?.GetDiet() == _animal.GetType());
+        Animal[] potentialPredators =
+            Array.ConvertAll(nearbySpecieColliders, c => c.gameObject.GetComponent<Animal>());
+
+        // check which ones are chasing
+        Animal closestPredator = null;
+        float smallestDist = _animal.GetSenseRadius() + 1;
+        foreach (Animal a in potentialPredators)
+        {
+            // if predator is chasing this animal
+            if (a.GetState() == typeof(ChasingFood))
+            {
+                if (a != null && a.TargetFood != null)
+                {
+                    if (a.TargetFood.gameObject == _animal.gameObject)
+                    {
+                        float dist = Vector3.Distance(transform.position, a.transform.position);
+                        if (dist < smallestDist &&
+                            dist > Mathf.Epsilon)
+                        {
+                            closestPredator = a;
+                            smallestDist = dist;
+                        }
+                    }
+                }
+            }
+        }
+
+        return closestPredator;
     }
 
     public void OnPathFound(Vector3[] newPath, bool pathSuccessful)

@@ -63,7 +63,7 @@ public class Fleeing : State
         }
         else
         {
-            _animal.MoveTick(_destination.Value); // calls move method in animal
+            _animal.MoveTick(_destination.Value, 1.5f); // calls move method in animal with a speed modifier
         }
 
         Debug.DrawRay(transform.position, _destination.Value - transform.position, Color.red);

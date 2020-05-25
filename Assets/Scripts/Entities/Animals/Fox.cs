@@ -7,8 +7,8 @@ namespace Entities
     public class Fox : Animal
     {
         // traits
-        private float _moveSpeed = 2.5f;
-        private float _senseRadius = 10f;
+        private float _moveSpeed = 3.5f;
+        private float _senseRadius = 20f;
 
         // diet
         private readonly Type _diet = typeof(Rabbit);
@@ -47,11 +47,31 @@ namespace Entities
                 _mat.color = _possibleColors[i];
         }
 
+        public override void SpawnOffspring()
+        {
+            for (int i = 0; i < Random.Range(1, 2); i++)
+            {
+                Animal newAnimal = AnimalSpawner.GetNewInstance().GetComponent<Animal>();
 
+                newAnimal.SetTraits(moveSpeed, senseRadius); //overwrite awake SetTraits
+                adultMoveSpeed = moveSpeed;
+
+                newAnimal.AnimalIsYoung();
+                newAnimal.transform.position += Vector3.forward * Random.Range(-1f, 1f) +
+                                                Vector3.right * Random.Range(-1f, 1f);
+                newAnimal.transform.SetParent(transform.parent);
+                newAnimal.gameObject.name = "Fox (born)";
+            }
+        }
 
         public override void MoveTick(Vector3 destination)
         {
             base.MoveTick(destination);
+        }
+
+        public override void MoveTick(Vector3 destination, float speedModifier)
+        {
+            base.MoveTick(destination, speedModifier);
         }
     }
 }
