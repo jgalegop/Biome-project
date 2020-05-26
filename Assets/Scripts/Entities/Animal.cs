@@ -251,9 +251,20 @@ namespace Entities
 
 
         private int _tickOfDeath = 0;
+        private Vector3 _deathPos;
+        private Vector3 _deathScale;
 
         public override void BeingEaten()
         {
+            if (_tickOfDeath == 0)
+            {
+                _deathPos = transform.position;
+                _deathScale = transform.localScale;
+            }
+
+            transform.position = _deathPos;
+            transform.localScale = _deathScale - Vector3.up * Mathf.Lerp(0, 0.5f * _deathScale.y, 0.1f);
+            transform.position += Vector3.up * (GroundYPos + 0.5f * transform.localScale.y - transform.position.y);
             _tickOfDeath++;
             if (_tickOfDeath > 100)
                 Die();
